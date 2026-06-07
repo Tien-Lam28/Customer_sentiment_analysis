@@ -189,329 +189,445 @@ python src/evaluation/error_analysis.py
 - Package the final pipeline for inference once deployment becomes in scope.
 
 ---
-# PHASES FOR MEMBERS
-## PHASE 1 — DATA UNDERSTANDING & EXPLORATORY DATA ANALYSIS (EDA)
-#### Mục tiêu:
-Hiểu dữ liệu trước khi xây dựng mô hình.
-Thành viên phụ trách: Diệu Thùy
-
-#### Làm việc trên:
-notebooks/
-├── 01_data_understanding.ipynb
-└── 02_eda.ipynb
-src/data/
-├── load_data.py
-
-#### Input:
-data/raw/reviews.csv
-
-#### Công việc:
-1. Đọc dữ liệu.
-2. Kiểm tra:
-* Missing values
-* Duplicate records
-* Dữ liệu bất thường
-* Nhãn mất cân bằng
-
-3. Thống kê:
-* Số lượng review
-* Số lượng nhãn
-* Tỷ lệ Positive / Neutral / Negative
-* Phân bố rating
-
-4. Phân tích văn bản:
-* Độ dài review
-* Tần suất từ xuất hiện
-* WordCloud
-
-5. Vẽ biểu đồ
-
-#### Thư viện có thể sẽ cần:
-* pandas
-* numpy
-* matplotlib
-* seaborn
-* wordcloud
-
-Kết quả đầu ra:
-reports/figures/
-
-Ví dụ:
-reports/figures/class_distribution.png
-reports/figures/rating_distribution.png
-
-Yêu cầu kiến thức:
-Hiểu: Chung là đang làm gì
-* Missing Value
-* Duplicate Data
-* Class Imbalance
-* Data Distribution
+# 📌 PHASES FOR MEMBERS
 
 ---
 
-## PHASE 2 — TEXT PREPROCESSING
-#### Mục tiêu:
+# PHASE 1 — DATA UNDERSTANDING & EXPLORATORY DATA ANALYSIS (EDA)
+
+## 🎯 Mục tiêu
+Hiểu rõ dữ liệu trước khi xây dựng mô hình.
+
+**Thành viên phụ trách:** Diệu Thùy
+
+## 📂 Làm việc trên
+
+```text
+notebooks/
+├── 01_data_understanding.ipynb
+└── 02_eda.ipynb
+
+src/data/
+└── load_data.py
+```
+
+## 📥 Input
+
+```text
+data/raw/reviews.csv
+```
+
+## 🛠 Công việc
+
+### 1. Khám phá dữ liệu
+- Đọc dữ liệu
+- Kiểm tra cấu trúc dữ liệu
+
+### 2. Kiểm tra chất lượng dữ liệu
+- Missing Values
+- Duplicate Records
+- Dữ liệu bất thường (Outliers / Invalid Values)
+- Mất cân bằng nhãn (Class Imbalance)
+
+### 3. Thống kê mô tả
+- Số lượng review
+- Số lượng nhãn
+- Tỷ lệ Positive / Neutral / Negative
+- Phân bố Rating
+
+### 4. Phân tích văn bản
+- Độ dài review
+- Tần suất xuất hiện từ
+- Word Cloud
+
+### 5. Trực quan hóa dữ liệu
+- Vẽ các biểu đồ mô tả dữ liệu
+
+## 📚 Thư viện
+
+- pandas
+- numpy
+- matplotlib
+- seaborn
+- wordcloud
+
+## 📤 Kết quả đầu ra
+
+```text
+reports/figures/
+├── class_distribution.png
+└── rating_distribution.png
+```
+
+## 🧠 Kiến thức cần nắm
+
+- Missing Values
+- Duplicate Data
+- Class Imbalance
+- Data Distribution
+
+---
+
+# PHASE 2 — TEXT PREPROCESSING
+
+## 🎯 Mục tiêu
+
 Làm sạch và chuẩn hóa toàn bộ dữ liệu văn bản.
-Thành viên phụ trách: Nhật Tiến
 
+**Thành viên phụ trách:** Nhật Tiến
 
-#### Làm việc trên:
+## 📂 Làm việc trên
+
+```text
 notebooks/
 └── 03_text_preprocessing.ipynb
+
 src/preprocessing/
 ├── clean_text.py
 ├── normalize_text.py
 ├── word_segmentation.py
 └── tokenizer.py
+```
 
-#### Input:
+## 📥 Input
+
+```text
 data/raw/reviews.csv
+```
 
-#### Công việc:
-clean_text.py:
-* lowercase
-* remove url
-* remove html
-* remove punctuation
-* remove special characters
+## 🛠 Công việc
 
-normalize_text.py:
+### clean_text.py
+- Chuyển về chữ thường (Lowercase)
+- Xóa URL
+- Xóa HTML Tags
+- Xóa dấu câu
+- Xóa ký tự đặc biệt
+
+### normalize_text.py
 - Chuẩn hóa từ ngữ
-- Xử lí các ký tự đặt biệt
+- Chuẩn hóa ký tự đặc biệt
 
-word_segmentation.py:
-Thử nghiệm:
-* Underthesea
-* PyVi
+### word_segmentation.py
+Thử nghiệm các công cụ:
+- Underthesea
+- PyVi
 
-tokenizer.py
+### tokenizer.py
 Chuẩn bị tokenizer cho:
-* TF-IDF
-* PhoBERT
+- TF-IDF
+- PhoBERT
 
-#### Thư viện:
-* regex
-* underthesea
-* pyvi
-* transformers
+## 📚 Thư viện
 
-#### Kết quả đầu ra:
+- regex
+- underthesea
+- pyvi
+- transformers
+
+## 📤 Kết quả đầu ra
+
+```text
 data/interim/clean_reviews.csv
+```
 
-#### Yêu cầu kiến thức:
-Hiểu: Mình đang làm gì
-* Tokenization
-* Word Segmentation
-* Text Normalization
-* Stopwords
+## 🧠 Kiến thức cần nắm
+
+- Tokenization
+- Word Segmentation
+- Text Normalization
+- Stopwords
 
 ---
 
-## PHASE 3 — FEATURE ENGINEERING
-#### Mục tiêu:
-Biến dữ liệu text thành vector số.
-Thành viên phụ trách: Hưng Trương
+# PHASE 3 — FEATURE ENGINEERING
 
-#### Làm việc trên:
+## 🎯 Mục tiêu
+
+Biến dữ liệu văn bản thành vector số phục vụ huấn luyện mô hình.
+
+**Thành viên phụ trách:** Hưng Trương
+
+## 📂 Làm việc trên
+
+```text
 notebooks/
 └── 04_feature_engineering.ipynb
+
 src/features/
 ├── tfidf_features.py
 ├── word2vec_features.py
 └── fasttext_features.py
+```
 
-#### Input:
+## 📥 Input
+
+```text
 data/interim/clean_reviews.csv
+```
 
-#### Công việc:
-1. Xây dựng các vector số từ chữ
-2. PhoBERT Features
+## 🛠 Công việc
 
-Thư viện:
-* scikit-learn
-* transformers
+### 1. Trích xuất đặc trưng văn bản
+- TF-IDF
+- Word2Vec
+- FastText
 
-Kết quả đầu ra:
-data/processed/tfidf_features.pkl
-data/processed/phobert_features.pkl
-data/processed/metadata.csv
+### 2. Sinh đặc trưng từ PhoBERT
+- PhoBERT Embeddings
 
-Yêu cầu kiến thức:
-Hiểu: Mình đang làm gì
-* Bag of Words
-* TF-IDF
-* Embedding
-* Dense Vector
-* Sparse Vector
+## 📚 Thư viện
+
+- scikit-learn
+- transformers
+
+## 📤 Kết quả đầu ra
+
+```text
+data/processed/
+├── tfidf_features.pkl
+├── phobert_features.pkl
+└── metadata.csv
+```
+
+## 🧠 Kiến thức cần nắm
+
+- Bag of Words
+- TF-IDF
+- Embedding
+- Dense Vector
+- Sparse Vector
 
 ---
 
-## PHASE 4 — BASELINE MACHINE LEARNING MODELS
-#### Mục tiêu:
-Tạo các mô hình cơ sở để làm chuẩn so sánh.
-Thành viên phụ trách: Quốc Triều
+# PHASE 4 — BASELINE MACHINE LEARNING MODELS
 
-#### Làm việc trên:
+## 🎯 Mục tiêu
+
+Xây dựng các mô hình Machine Learning cơ sở để làm chuẩn so sánh.
+
+**Thành viên phụ trách:** Quốc Triều
+
+## 📂 Làm việc trên
+
+```text
 notebooks/
 ├── 05_baseline_model.ipynb
 └── 06_svm_model.ipynb
+
 src/models/
 ├── train_logistic_regression.py
 ├── train_naive_bayes.py
 └── train_svm.py
+```
 
-#### Input:
+## 📥 Input
+
+```text
 data/processed/tfidf_features.pkl
+```
 
-#### Công việc:
-Xây dựng được một mô hình baseline phân loại được và phân loại tốt cảm xúc của khách hàng
+## 🛠 Công việc
 
-Thư viện:
-* scikit-learn
+Xây dựng và đánh giá các mô hình:
 
-#### Kết quả đầu ra:
+- Logistic Regression
+- Naive Bayes
+- SVM
+
+Mục tiêu:
+- Có mô hình phân loại cảm xúc hoạt động tốt
+- Làm baseline cho các mô hình Deep Learning
+
+## 📚 Thư viện
+
+- scikit-learn
+
+## 📤 Kết quả đầu ra
+
+```text
 models/baseline/
+```
 
-#### Yêu cầu kiến thức:
-Hiểu: Mình đang làm gì
-* Classification
-* Decision Boundary
-* Hyperparameter
-* Overfitting
-* Underfitting
+## 🧠 Kiến thức cần nắm
+
+- Classification
+- Decision Boundary
+- Hyperparameter
+- Overfitting
+- Underfitting
 
 ---
 
-## PHASE 5 — DEEP LEARNING MODELS
-#### Mục tiêu:
-Xây dựng các mô hình hiện đại cho NLP.
-Thành viên phụ trách: Ngọc Tiến, Hoàng Sang
+# PHASE 5 — DEEP LEARNING MODELS
 
-#### Làm việc trên:
+## 🎯 Mục tiêu
+
+Xây dựng các mô hình NLP hiện đại dựa trên Deep Learning.
+
+**Thành viên phụ trách:** Ngọc Tiến, Hoàng Sang
+
+## 📂 Làm việc trên
+
+```text
 notebooks/
 ├── 07_lstm_model.ipynb
-└── 08_phobert_finetuning.ipynb 
+└── 08_phobert_finetuning.ipynb
+
 src/models/
 ├── train_lstm.py
 └── train_phobert.py
+```
 
-#### Input:
+## 📥 Input
+
+```text
 data/interim/clean_reviews.csv
+```
 
-#### Công việc:
-Có thể dựa trên các pipeline trên, không thì tạo mới cũng oke thoi nhưng chung quy là tạo được một mô hình DL tốt 
-1. LSTM
+## 🛠 Công việc
+
+### 1. LSTM
+
+```text
 Text
-↓
+ ↓
 Embedding
-↓
+ ↓
 LSTM
-↓
+ ↓
 Linear
-↓
+ ↓
 Softmax
+```
 
-3. PhoBERT Fine-Tuning
+### 2. PhoBERT Fine-Tuning
+
+```text
 Text
-↓
+ ↓
 PhoBERT
-↓
+ ↓
 Classification Head
-↓
+ ↓
 Softmax
+```
 
-4. PhoBERT + Metadata
+### 3. PhoBERT + Metadata
+
+```text
 PhoBERT Embedding
-*
+      +
 rating_stars
-*
+      +
 has_media
-↓
+      ↓
 Dense Layer
-↓
+      ↓
 Prediction
+```
 
-#### Thư viện:
-* torch
-* transformers
-* datasets
+Có thể tận dụng pipeline hiện tại hoặc xây dựng pipeline mới nếu cần, miễn đạt được mô hình Deep Learning hiệu quả.
 
-#### Kết quả đầu ra:
-models/lstm/
-models/phobert/
+## 📚 Thư viện
 
-#### Yêu cầu kiến thức:
-Hiểu:
-* Neural Network
-* Embedding
-* Backpropagation
-* Fine-Tuning
-* Transformer
-* Attention
+- torch
+- transformers
+- datasets
+
+## 📤 Kết quả đầu ra
+
+```text
+models/
+├── lstm/
+└── phobert/
+```
+
+## 🧠 Kiến thức cần nắm
+
+- Neural Network
+- Embedding
+- Backpropagation
+- Fine-Tuning
+- Transformer
+- Attention Mechanism
 
 ---
 
-## PHASE 6 — MODEL EVALUATION & ERROR ANALYSIS
-#### Mục tiêu:
-So sánh các mô hình, giải thích các tham số
-Thành viên phụ trách: Nhật Tiến
+# PHASE 6 — MODEL EVALUATION & ERROR ANALYSIS
 
-#### Làm việc trên:
+## 🎯 Mục tiêu
+
+Đánh giá, so sánh và phân tích lỗi của các mô hình.
+
+**Thành viên phụ trách:** Nhật Tiến
+
+## 📂 Làm việc trên
+
+```text
 notebooks/
 ├── 09_evaluation.ipynb
 └── 10_error_analysis.ipynb
+
 src/evaluation/
 ├── metrics.py
 ├── confusion_matrix.py
 └── error_analysis.py
+```
 
-#### Input:
-Tất cả mô hình đã huấn luyện.
+## 📥 Input
 
-#### Công việc:
-1. Đánh giá:
-* Accuracy
-* Precision
-* Recall
-* F1 Score
+```text
+Tất cả các mô hình đã được huấn luyện.
+```
 
-2. Vẽ:
-* Confusion Matrix
+## 🛠 Công việc
 
-3. So sánh: Các mô hình với nhau
+### 1. Đánh giá mô hình
+- Accuracy
+- Precision
+- Recall
+- F1 Score
 
-4. Error Analysis
-Lấy các mẫu dự đoán sai.
-Phân loại nguyên nhân:
-* Teencode
-* Sai chính tả
-* Sarcasm
-* Review quá ngắn
-* Đa nghĩa
+### 2. Trực quan hóa
+- Confusion Matrix
 
-#### Thư viện:
-* scikit-learn
-* pandas
-* matplotlib
-* seaborn
+### 3. So sánh mô hình
+- So sánh kết quả giữa các mô hình
 
-#### Kết quả đầu ra:
-reports/figures/
-reports/tables/
+### 4. Error Analysis
 
-Ví dụ:
-model_comparison.csv
-confusion_matrix.png
-error_samples.csv
+Thu thập các mẫu dự đoán sai và phân loại nguyên nhân:
 
-Yêu cầu kiến thức:
-Hiểu:
-* Precision
-* Recall
-* F1 Score
-* Confusion Matrix
-* False Positive
-* False Negative
+- Teencode
+- Sai chính tả
+- Sarcasm
+- Review quá ngắn
+- Từ ngữ đa nghĩa
 
+## 📚 Thư viện
 
+- scikit-learn
+- pandas
+- matplotlib
+- seaborn
 
+## 📤 Kết quả đầu ra
+
+```text
+reports/
+├── figures/
+│   └── confusion_matrix.png
+└── tables/
+    ├── model_comparison.csv
+    └── error_samples.csv
+```
+
+## 🧠 Kiến thức cần nắm
+
+- Precision
+- Recall
+- F1 Score
+- Confusion Matrix
+- False Positive
+- False Negative
