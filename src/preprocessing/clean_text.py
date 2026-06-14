@@ -1,6 +1,6 @@
 import re
 import string
-
+## Kiểm tra lại phần này
 def remove_url(text):
     return re.sub(r"http\S+|www\S+", "", text)
 
