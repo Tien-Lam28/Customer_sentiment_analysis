@@ -4,7 +4,7 @@
 
 Customer reviews contain valuable signals about customer satisfaction, product quality, service issues, and brand perception. However, manually reading and classifying large volumes of reviews is slow, inconsistent, and difficult to scale.
 
-This project builds an end-to-end Natural Language Processing pipeline to classify Vietnamese customer reviews into three sentiment categories: **Positive**, **Neutral**, and **Negative**. The repository is organized for reproducible experimentation, model comparison, evaluation, and final reporting.
+This project builds an end-to-end Natural Language Processing pipeline to classify Vietnamese customer reviews into three sentiment categories: **Positive**, and **Negative**. The repository is organized for reproducible experimentation, model comparison, evaluation, and final reporting.
 
 ## Objectives
 
@@ -44,8 +44,6 @@ Feature Engineering
 Model Training
     ↓
 Evaluation
-    ↓
-Error Analysis
 ```
 
 ## Models
@@ -88,8 +86,6 @@ sentiment-analysis-vietnamese/
 │   ├── 06_svm_model.ipynb
 │   ├── 07_lstm_model.ipynb
 │   ├── 08_phobert_finetuning.ipynb
-│   ├── 09_evaluation.ipynb
-│   └── 10_error_analysis.ipynb
 │
 ├── src/
 │   ├── __init__.py
@@ -111,10 +107,6 @@ sentiment-analysis-vietnamese/
 │   │   ├── train_svm.py
 │   │   ├── train_lstm.py
 │   │   └── train_phobert.py
-│   ├── evaluation/
-│   │   ├── metrics.py
-│   │   ├── confusion_matrix.py
-│   │   └── error_analysis.py
 │   └── utils/
 │       ├── config.py
 │       └── helpers.py
@@ -232,7 +224,7 @@ data/raw/reviews.csv
 ### 3. Thống kê mô tả
 - Số lượng review
 - Số lượng nhãn
-- Tỷ lệ Positive / Neutral / Negative
+- Tỷ lệ Positive / Negative
 - Phân bố Rating
 
 ### 4. Phân tích văn bản
@@ -244,12 +236,8 @@ data/raw/reviews.csv
 - Vẽ các biểu đồ mô tả dữ liệu
 
 ## 📚 Thư viện
-
-- pandas
-- numpy
-- matplotlib
-- seaborn
-- wordcloud
+ 
+ - Có thể xem thêm trong requirements.txt
 
 ## 📤 Kết quả đầu ra
 
@@ -346,7 +334,7 @@ data/interim/clean_reviews.csv
 
 Biến dữ liệu văn bản thành vector số phục vụ huấn luyện mô hình.
 
-**Thành viên phụ trách:** Hưng Trương, Quang Phong
+**Thành viên phụ trách:** Hưng Trương
 
 ## 📂 Làm việc trên
 
@@ -552,82 +540,3 @@ models/
 - Transformer
 - Attention Mechanism
 
----
-
-# PHASE 6 — MODEL EVALUATION & ERROR ANALYSIS
-
-## 🎯 Mục tiêu
-
-Đánh giá, so sánh và phân tích lỗi của các mô hình.
-
-**Thành viên phụ trách:** Nhật Tiến
-
-## 📂 Làm việc trên
-
-```text
-notebooks/
-├── 09_evaluation.ipynb
-└── 10_error_analysis.ipynb
-
-src/evaluation/
-├── metrics.py
-├── confusion_matrix.py
-└── error_analysis.py
-```
-
-## 📥 Input
-
-```text
-Tất cả các mô hình đã được huấn luyện.
-```
-
-## 🛠 Công việc
-
-### 1. Đánh giá mô hình
-- Accuracy
-- Precision
-- Recall
-- F1 Score
-
-### 2. Trực quan hóa
-- Confusion Matrix
-
-### 3. So sánh mô hình
-- So sánh kết quả giữa các mô hình
-
-### 4. Error Analysis
-
-Thu thập các mẫu dự đoán sai và phân loại nguyên nhân:
-
-- Teencode
-- Sai chính tả
-- Sarcasm
-- Review quá ngắn
-- Từ ngữ đa nghĩa
-
-## 📚 Thư viện
-
-- scikit-learn
-- pandas
-- matplotlib
-- seaborn
-
-## 📤 Kết quả đầu ra
-
-```text
-reports/
-├── figures/
-│   └── confusion_matrix.png
-└── tables/
-    ├── model_comparison.csv
-    └── error_samples.csv
-```
-
-## 🧠 Kiến thức cần nắm
-
-- Precision
-- Recall
-- F1 Score
-- Confusion Matrix
-- False Positive
-- False Negative
