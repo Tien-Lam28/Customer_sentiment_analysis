@@ -1,720 +1,540 @@
-# Nhóm 1: Giới thiệu
+# BÁO CÁO DỰ ÁN: Ứng dụng Xử lý Ngôn ngữ Tự nhiên trong Phân tích cảm xúc khách hàng
+## Thông tin Dự án
 
-| MSSV     | Họ tên             | Tasks | Mức độ đóng góp (%) |
-|----------|--------------------|-------|---------------------|
-| 24280027 | Lâm Nhật Tiến      |   Text Preprocessing, Viết báo cáo    | 15                  |
-| 24280094 | Đỗ Quang Phong     |   Text Preprocessing, Viết báo cáo    | 15                  |
-| 24280026 | Phạm Thị Diệu Thùy |    EDA   | 14                  |
-| 24280028 | Phạm Quốc Triều    |    Baseline Models   | 14                  |
-| 24280068 | Trương Đình Hưng   |    Feature Engineer   | 14                  |
-| 24280102 | Nguyễn Hoàng Sang  |    LSTM Model   | 14                  |
-| 24280109 | Tô Ngọc Tiến       |    PhoBERT Model   | 14                  |
-<br>
+**Học phần:** Nhập môn Khoa học dữ liệu  
+**Tên dự án:** Ứng dụng Xử lý Ngôn ngữ Tự nhiên trong Phân tích cảm xúc khách hàng
+**Kho GitHub:** https://github.com/wangpo1009/Customer_sentiment_analysis.git
 
-"Hạnh phúc là quá trình, không phải kết quả"
+**Thành viên nhóm**
 
-# A. Vấn đề và một cách giải quyết của nhóm 
-### Vấn đề:
-* Trong kinh doanh, bán hàng online trong hiện tại đã và đang bước vào thời kỳ hoàng kim, số doanh nghiệp, số lượng đơn hàng trực tuyến tăng vọt. Vì vậy, các vấn đề về việc phân tích và cải thiện doanh số của các doanh nghiệp cũng theo đó mà tăng vọt, và một trong đó là **phân tích các đánh giá của khách mua hàng**. Đây là một vấn đề khó khăn một khi số đánh giá tăng lên quá nhiều, ta không thể nào đọc từng dòng hoặc có thể thuê người đọc, đánh giá và lọc, nhưng sẽ vô cùng mất thời gian và tốn kém. Vậy giải quyết vấn đề như thế nào bây giờ? 
+| MSSV | Họ tên | Phần việc chính | Mức độ đóng góp |
+| --- | --- | --- | ---: |
+| 24280027 | Lâm Nhật Tiến | Text Preprocessing, viết báo cáo | $15\%$ |
+| 24280094 | Đỗ Quang Phong | Text Preprocessing, viết báo cáo | $15\%$ |
+| 24280026 | Phạm Thị Diệu Thùy | Data Understanding, EDA, chỉnh sửa báo cáo | $15\%$ |
+| 24280028 | Phạm Quốc Triều | Baseline Models | $14\%$ |
+| 24280068 | Trương Đình Hưng | Feature Engineering | $14\%$ |
+| 24280102 | Nguyễn Hoàng Sang | LSTM Model | $14\%$ |
+| 24280109 | Tô Ngọc Tiến | PhoBERT Model | $13\%$ |
 
-### Một lời giải của nhóm: 
-* Trong thời đại mà đến cảm xúc còn có thể được cài đặt cho máy móc thì việc ta không dùng đến chúng là một sự lỗi thời và xuống cấp mạnh của hiệu suất công việc. Vì vậy theo nhóm, một giải pháp tân thời, ta có thể sử dụng **mô hình học máy** để phân tích và phân loại tính chất của nhận xét. 
-* Giới thiệu sơ bộ về mô hình mà nhóm dùng: Long Short-Term Memory (hay LSTM) là một mô hình học sâu được cải tiến dựa trên RNNs (Recurrent Neural Networks) với ý tưởng đại khái là máy móc sẽ "đọc" từng chữ, "nhớ", "đánh giá" rồi "phân loại" (Ý tưởng sẽ được giải thích rõ hơn ở phần sau).
+## MỤC LỤC
 
+- [PHẦN 1: GIỚI THIỆU](#phần-1-giới-thiệu)
+  - [1. Tổng quan dự án](#1-tổng-quan-dự-án)
+  - [2. Tổng quan Tài liệu](#2-tổng-quan-tài-liệu)
+  - [3. Bộ dữ liệu (Dataset)](#3-bộ-dữ-liệu-dataset)
+- [PHẦN 2: XỬ LÝ DỮ LIỆU VÀ TRÍCH XUẤT ĐẶC TRƯNG](#phần-2-xử-lý-dữ-liệu-và-trích-xuất-đặc-trưng)
+  - [1. Tiền xử lý dữ liệu (Data Preprocessing)](#1-tiền-xử-lý-dữ-liệu-data-preprocessing)
+  - [2. Trích xuất đặc trưng (Feature Engineering)](#2-trích-xuất-đặc-trưng-feature-engineering)
+- [PHẦN 3: XÂY DỰNG VÀ ĐÁNH GIÁ MÔ HÌNH](#phần-3-xây-dựng-và-đánh-giá-mô-hình)
+  - [1. Các mô hình đã triển khai](#1-các-mô-hình-đã-triển-khai)
+  - [2. Đánh giá và So sánh mô hình](#2-đánh-giá-và-so-sánh-mô-hình)
+  - [3. Kết luận và Hướng phát triển](#3-kết-luận-và-hướng-phát-triển)
+- [PHỤ LỤC](#phụ-lục)
 
---- 
+---
 
-# B. Mô tả chi tiết
+## PHẦN 1: GIỚI THIỆU
 
-## Phần 1: Dữ liệu
-### Nguồn:
-Dữ liệu được chia sẻ trên trang Kaggle. Link: https://www.kaggle.com/datasets/dduongdev/shopee-vietnamese-product-reviews-sentiment
+### 1. Tổng quan dự án
 
-### Mô tả dữ liệu: 
-Dữ liệu gồm hơn 10000 dòng dữ liệu được chia vào thành 2 tập shopee và augmented về đánh giá sản phẩm trên shopee của các doanh nghiệp bán lẻ, gồm 4 cột:
-```text
-id  |  review   |   rating  |   label
-```
-Ý nghĩa của các cột:
-- **id**: Khóa chính, là mã số của đánh giá.
-- **review**: Chứa đánh giá của các khách hàng.
-- **rating**: Số sao mà khách hàng đánh giá cho sản phẩm.
-- **label**: Nhãn thật sự của đánh giá.  
+#### 1.1. Đặt vấn đề
 
-Theo các phân tích, bộ dữ liệu khá sạch khi về căn bản không có dòng nào chứa null, không có dòng bị trùng lặp, các nhãn được ghi đầy đủ.
-- Review dài nhất chứa 2021 ký tự, ngắn nhất 20 ký tự.
-- Trong bộ dữ liệu gốc cũng chứa các ký tự lạ, emoji/icon, có chứa từ sai chính tả, có từ bị kéo dài  
+Trong thương mại điện tử, phản hồi của khách hàng là nguồn dữ liệu quan trọng giúp doanh nghiệp hiểu mức độ hài lòng, chất lượng sản phẩm, trải nghiệm dịch vụ và các vấn đề cần cải thiện. Tuy nhiên, khi số lượng đánh giá tăng nhanh, **việc đọc thủ công từng bình luận trở nên tốn thời gian, khó mở rộng và dễ thiếu nhất quán** giữa những người đánh giá khác nhau.
 
-### EDA:
-#### 1/ Trực quan hóa không gian đặc trưng bằng t-SNE (Feature Separability Analysis)
+Bài toán đặt ra là xây dựng một hệ thống có khả năng **tự động phân loại cảm xúc** trong đánh giá sản phẩm tiếng Việt, cụ thể là phân loại phản hồi khách hàng thành hai nhóm chính: **Positive** và **Negative**. Với hệ thống này, doanh nghiệp có thể nhanh chóng nhận diện các phản hồi tiêu cực cần xử lý, đồng thời khai thác phản hồi tích cực để hiểu điểm mạnh của sản phẩm hoặc dịch vụ.
 
-<div align="center" style="font-weight: bold"> t-SNE Projection of Review TF-IDF Features (Shopee Dataset) </div>
+Dự án sử dụng các kỹ thuật **Xử lý Ngôn ngữ Tự nhiên** (Natural Language Processing - NLP), kết hợp giữa phương pháp học máy truyền thống, học sâu và mô hình ngôn ngữ tiền huấn luyện để xây dựng pipeline phân loại cảm xúc cho dữ liệu đánh giá sản phẩm Shopee tiếng Việt.
 
-![alt text](figures/tsne_feature_separability.png)
-**Nhận xét:** Biểu đồ cho thấy **hai nhóm cảm xúc** (`positive` và `negative`) có **sự chồng lấn (overlap) tương đối lớn**, nhưng vẫn **bộc lộ xu hướng phân cụm (clustering trend) theo vùng rõ rệt**.
-- Các đặc trưng TF-IDF thuần túy (tần suất từ) ở mức cơ bản đủ để thuật toán nhận diện được sự khác biệt giữa hai sắc thái, nhưng chưa đủ mạnh để phân tách chúng thành hai cụm hoàn toàn biệt lập.
+#### 1.2. Mục tiêu nghiên cứu
 
-<div align="center" style="font-weight: bold"> t-SNE Projection of Review TF-IDF Features (Augmented Dataset) </div>
+Dự án hướng đến các mục tiêu chính sau:
 
-![alt text](figures/tsne_feature_separability_aug.png)
-**Nhận xét:** Biểu đồ cho thấy **khả năng phân tách tuyến tính (separability) giữa hai nhãn cảm xúc đã được cải thiện rõ rệt** so với tập dữ liệu Shopee gốc.
-- Thay vì trộn lẫn phức tạp ở khu vực trung tâm, hai cụm dữ liệu giờ đây đã phân hóa theo trục dọc (`tsne_2`). Nhãn `positive` (màu xanh) chiếm lĩnh hoàn toàn nửa trên của không gian biểu đồ, trong khi nhãn `negative` (màu đỏ) tập trung chủ yếu ở nửa dưới.
+- Thu thập, tổ chức và phân tích bộ dữ liệu đánh giá sản phẩm Shopee tiếng Việt.
+- Làm sạch dữ liệu văn bản, xử lý các đặc trưng nhiễu thường gặp trong đánh giá trực tuyến như emoji, ký tự lạ, lỗi chính tả, từ viết tắt và ký tự lặp.
+- Thực hiện chuẩn hóa văn bản, tách từ tiếng Việt và tokenization phù hợp với từng nhóm mô hình.
+- Trích xuất đặc trưng văn bản bằng các phương pháp như TF-IDF, Word2Vec và FastText.
+- Xây dựng và so sánh các mô hình phân loại cảm xúc gồm Logistic Regression, Naive Bayes, Support Vector Machine, Bidirectional LSTM và PhoBERT Hybrid.
+- Đánh giá mô hình bằng các chỉ số Accuracy, Precision, Recall, F1-score và phân tích ưu nhược điểm của từng hướng tiếp cận.
+- Đề xuất mô hình phù hợp trong bối cảnh ứng dụng thực tế, có xét đến hiệu quả dự đoán, chi phí huấn luyện và khả năng triển khai.
 
-#### 2/ Phân phối số lượng mẫu và nhãn
-<div align="center" style="font-weight: bold"> Biểu đồ phân phối nhãn </div>
+#### 1.3. Phạm vi và giới hạn
 
-![alt text](figures/class_distribution.png)
+Phạm vi của dự án tập trung vào bài toán phân loại cảm xúc cho đánh giá sản phẩm tiếng Việt trên nền tảng thương mại điện tử Shopee. Dữ liệu đầu vào chủ yếu gồm nội dung đánh giá, số sao và nhãn cảm xúc. Một số thử nghiệm nâng cao có sử dụng thêm metadata như số sao đánh giá và thông tin có/không có hình ảnh hoặc video.
 
-**Nhận xét:** Biểu đồ trên cho thấy 
-- **Tập dữ liệu gốc (Shopee Dataset)**  
-  - **Phân bố**: Nhãn `negative` chiếm ưu thế áp đảo với **5,965 mẫu**, trong khi nhãn `positive` chỉ có **3,634 mẫu**.
-  - **Đặc trưng:** Nhóm tiêu cực chiếm khoảng **62%** tổng số dữ liệu. Hơi là lạ, doanh nghiệp này có lẽ cần phải kiểm tra lại phương thức bán hàng. Nhưng với vấn đề học máy, đây chỉ là một sự lệch dữ liệu nhỏ, không đáng kể, không ảnh hưởng quá sâu sắc đến khả năng học, chỉ hơi bias nhẹ một tí cho nhãn `negative` thôi.
+Dự án giới hạn ở bài toán phân loại nhị phân gồm hai lớp **Positive** và **Negative**. Các sắc thái trung lập, mỉa mai, cảm xúc hỗn hợp hoặc các khía cạnh chi tiết hơn như chất lượng giao hàng, giá cả, đóng gói, chăm sóc khách hàng chưa được tách thành các nhãn riêng. Ngoài ra, kết quả mô hình phụ thuộc vào chất lượng nhãn của bộ dữ liệu; trong quá trình EDA, nhóm nhận thấy dữ liệu gốc có hiện tượng nhiễu nhãn, đặc biệt ở các mức rating trung gian.
 
-- **Tập dữ liệu tăng cường (Augmented Dataset)**
-  - **Phân bố:** Nhãn `negative` có **677 mẫu** và `positive` có **671 mẫu**.
-  - **Đặc trưng:** Việc chủ động đưa tỷ lệ về mức xấp xỉ $50:50$ giúp loại bỏ hoàn toàn bộ yếu tố thiên vị class khi huấn luyện.  
-  <br>
+### 2. Tổng quan Tài liệu
 
+#### 2.1. Các nghiên cứu liên quan
 
-<div align="center" style="font-weight: bold"> Biểu đồ phân phối rating của khách hàng </div>
+Phân tích cảm xúc khách hàng là một trong những bài toán ứng dụng phổ biến của NLP. Trong các hệ thống thương mại điện tử, phân tích cảm xúc thường được dùng để tự động đánh giá thái độ của người dùng đối với sản phẩm hoặc dịch vụ. Các hướng tiếp cận thường gặp gồm:
 
-![alt text](figures/rating_distribution.png)
-**Nhận xét:** Nhìn chung, cấu hình phân bổ điểm đánh giá giữa hai tập dữ liệu giữ **nguyên hình dáng tổng thể** (distribution shape). Cả hai đều mang đặc trưng của dữ liệu đánh giá thương mại điện tử thực tế: **Phân hóa mạnh về hai đầu cực đoan** (tập trung rất nhiều vào `1 sao` và `5 sao`, cực kỳ ít ở `4 sao`).
+- Phương pháp dựa trên từ điển cảm xúc, trong đó hệ thống dựa vào danh sách từ tích cực và tiêu cực để suy luận nhãn.
+- Phương pháp học máy truyền thống, sử dụng đặc trưng thủ công hoặc vector hóa văn bản như Bag of Words, TF-IDF kết hợp với các mô hình Logistic Regression, Naive Bayes hoặc SVM.
+- Phương pháp học sâu, sử dụng mạng nơ-ron như CNN, RNN, LSTM hoặc BiLSTM để học biểu diễn ngữ cảnh từ chuỗi token.
+- Phương pháp dựa trên Transformer và mô hình ngôn ngữ tiền huấn luyện như BERT, RoBERTa, PhoBERT để khai thác biểu diễn ngữ nghĩa sâu hơn.
 
-Điều này chứng tỏ quá trình lấy mẫu (sampling) hoặc trích xuất để tạo tập `Augmented Dataset` đã **bảo toàn khá tốt tỷ lệ cấu trúc rating gốc**, không làm lệch phân phối điểm số ban đầu của người dùng.
+Trong dự án này, nhóm triển khai cả mô hình truyền thống và mô hình học sâu nhằm so sánh hiệu quả giữa các hướng tiếp cận. Các mô hình baseline dùng TF-IDF để tạo chuẩn so sánh ban đầu, trong khi LSTM và PhoBERT được sử dụng để đánh giá lợi ích của việc học ngữ cảnh và biểu diễn ngữ nghĩa.
 
-#### 3/ Mối quan hệ giữa điểm đánh giá và nhãn cảm xúc
-<div align="center" style="font-weight: bold"> Biểu đồ cột thể hiện mối quan hệ giữa nhãn và đánh giá </div>
+#### 2.2. Đặc thù tiếng Việt trong NLP
 
-![alt text](figures/label_by_rating_distribution.png)
+Tiếng Việt có nhiều đặc điểm khiến bài toán NLP cần được xử lý cẩn thận hơn so với một số ngôn ngữ dùng khoảng trắng để phân tách từ hoàn chỉnh. Một từ tiếng Việt có thể gồm nhiều âm tiết được viết cách nhau bằng khoảng trắng, ví dụ `sản phẩm`, `tuyệt vời`, `không tốt`. Vì vậy, nếu chỉ tách token theo khoảng trắng, mô hình có thể làm mất đơn vị nghĩa thật sự của từ hoặc cụm từ.
 
-**Nhận xét:** Biểu đồ này thể hiện một sự thật quan trọng: **Tập dữ liệu gốc (Shopee) bị nhiễu nhãn (Label Noise) rất nặng**, đặc biệt ở các dải điểm trung gian như `3 sao` và `4 sao`. Khi sang tập **Augmented Dataset**, mặc dù cấu trúc phân phối rating được giữ nguyên, nhưng mối quan hệ gán nhãn đã được phân định rạch ròi và "sạch" hơn đáng kể.
+Ngoài ra, dữ liệu đánh giá trực tuyến thường chứa nhiều hiện tượng phi chuẩn như viết tắt, thiếu dấu, sai chính tả, kéo dài ký tự để nhấn mạnh cảm xúc, emoji, icon, URL, HTML tag và dấu câu không nhất quán. Những hiện tượng này vừa chứa thông tin cảm xúc, vừa gây nhiễu cho mô hình nếu không được xử lý hợp lý.
 
-Do đồ thị dùng trục tung dạng **Log Scale**, các thanh bar thấp nhìn có vẻ không chênh lệch nhiều, nhưng thực tế số lượng chênh lệch tuyến tính là cực kỳ lớn.
+Do đó, pipeline của dự án cần kết hợp các bước làm sạch, chuẩn hóa, tách từ tiếng Việt và tokenization. Với các mô hình truyền thống như Logistic Regression, Naive Bayes và SVM, dữ liệu cần được xử lý kỹ để giảm nhiễu trước khi trích xuất đặc trưng TF-IDF. Với các mô hình như LSTM hoặc PhoBERT, việc tiền xử lý cần cân bằng giữa loại bỏ nhiễu và giữ lại thông tin ngữ cảnh quan trọng.
 
-#### 4/ Kết luận chung sau EDA
-<div align="center" style="font-weight: bold"> Tổng quan cấu trúc hệ thống dữ liệu </div>
+#### 2.3. Các phương pháp tiếp cận hiện có
 
-| Đặc trưng phân tích | Tập dữ liệu gốc (Shopee Dataset) | Tập dữ liệu tăng cường (Augmented Dataset) |
-| :--- | :--- | :--- |
-| **Số lượng mẫu** | 9,599 mẫu (Khá lớn) | 1,348 mẫu (Đã qua lọc/Downsampling) |
-| **Cân bằng nhãn** | Mất cân bằng nghiêm trọng (62% Negative : 38% Positive) | **Cân bằng lý tưởng (50% Negative : 50% Positive)** |
-| **Quy tắc gán nhãn** | Bị nhiễu nặng (Label Noise) ở mức 3 và 4 sao | Được làm sạch và chuẩn hóa triệt để theo mức Rating |
-| **Độ dài văn bản** | Phân phối tự nhiên (Negative dài hơn Positive một chút) | Nhân tạo (Negative bị kéo dài bất thường, tối đa ~155 từ) |
-| **Không gian ngữ nghĩa** | Chồng lấn mạnh ở trung tâm (Từ vựng trung tính nhiều) | **Phân tách tuyến tính rõ rệt trên trục dọc t-SNE** |
+Các phương pháp được sử dụng trong dự án có thể chia thành ba nhóm:
 
-**Caution:** Bộ dữ liệu Augmented quá "đẹp", quá "hoàn hảo", nhưng ông cha ta nói, cái gì quá cũng không tốt. Trong trường hợp này sự đẹp đó sẽ khiến mô hình sẽ học vẹt, và khi đưa  mô hình này deploy dự đoán các đánh giá tự nhiên ngoài đời thực, độ chính xác giảm (Drop Performance) là điều mà ta không thể tránh.
+1. **Vector hóa văn bản truyền thống:** TF-IDF biểu diễn văn bản bằng trọng số của các từ dựa trên tần suất xuất hiện trong từng văn bản và toàn bộ tập dữ liệu. Cách tiếp cận này đơn giản, dễ triển khai, có tính giải thích tương đối tốt nhưng chưa nắm bắt được thứ tự từ và quan hệ ngữ nghĩa sâu.
+2. **Embedding từ:** Word2Vec và FastText học vector biểu diễn từ dựa trên ngữ cảnh. Word2Vec giúp các từ có ngữ nghĩa gần nhau nằm gần nhau trong không gian vector, còn FastText cải thiện khả năng xử lý từ hiếm, từ sai chính tả hoặc biến thể ký tự nhờ cơ chế character n-gram.
+3. **Mô hình ngữ cảnh sâu:** LSTM học chuỗi token theo thứ tự và có khả năng ghi nhớ thông tin trước/sau trong văn bản, đặc biệt khi dùng Bidirectional LSTM. PhoBERT là mô hình Transformer tiền huấn luyện cho tiếng Việt, có khả năng học quan hệ ngữ cảnh phức tạp thông qua cơ chế attention.
 
-### Preprocessing
-Trong phần này, ta xem như đã gộp 2 dataset trên thành 1 để dễ hoạt động, tuy nhiên đối với mỗi mô hình, yêu cầu dữ liệu đầu vào là khác nhau, nên nhóm chia thành hai nhánh xử lí:
-- Một nhánh cho baseline model, tức là những model đơn giản như SVM -> Cần xử lí dữ liệu đầu vào phức tạp hơn, kỹ hơn một tí
-- Một nhánh cho neural network model, như LSTM hay PhoBERT -> Không cần xử lí quá kỹ, để giữ được nhiều thông tin hơn.
-</br>
+### 3. Bộ dữ liệu (Dataset)
 
-#### 1/ Clean text
-Trong phần này, trước hết, cần xử lí chung cho cả hai mô hình những điều như sau:
-- Chuẩn hóa khoảng trắng: loại bỏ các khoảng trắng dư thừa trong các câu.
-- Chuyển emoji thành dạng chữ: ở đây chúng em xử lí đơn giản bằng cách mapping các emoji thông dụng thành các dạng `positive_emoji`, `negative_emoji`, ...
-- Loại bỏ URL, HTML, email được dán kèm trong review.
+#### 3.1. Mô tả nguồn dữ liệu
 
-Riêng đối với mô hình baseline, ta cần xử lí khắc khe hơn một vài điều sau:
-- Chuyển chữ hoa thành chữ thường
-- Loại bỏ dấu câu
+Bộ dữ liệu gồm các đánh giá sản phẩm của khách hàng trên nền tảng Shopee và được tổ chức thành hai tập con:
 
-#### 2/ Normalize text
-Một trong những quy trình khó khăn nhất trong preprocessing, khi hiện tại vẫn có khá ít thư viện có thể xử lí một cách triệt để tiếng Việt. Một số điều nhóm em đã xử lí như sau:
-- **Chuẩn hóa lại các từ bị kéo dài:** ví dụ như "Phongggggg đẹpp trai" -> "Phongg đẹpp trai". Nhóm áp dụng kiểu chuyển nếu chứa từ 3 chữ lặp lại trở lên thì mới giảm xuống còn hai vì hai lý do chính: 
-    - Tránh loại bỏ mất các từ tiếng Anh như free, good,... (lí do chính)
-    - Giữ lại một tí thông tin, khi các từ kéo dài thường biểu thị cảm xúc "mạnh" hơn (lí do phụ)
-<br>
+| Tập dữ liệu | Mô tả |
+|-------------|-------|
+| **Shopee Dataset** | Tập gốc gồm hơn $9,599$ mẫu đánh giá thực tế |
+| **Augmented Dataset** | Tập đã qua lọc và cân bằng nhãn, gồm $1,348$ mẫu |
 
-- **Chuẩn hóa các từ viết tắt/slang:** Ở đây bọn em cũng chỉ dùng một cách đơn giản là mapping lại một số từ thông dụng rồi chuyển đổi lại thành dạng câu văn đầy đủ
-<br>
+Mỗi mẫu có cấu trúc bốn cột:
 
-- **Đổi từ tiếng Việt không dấu sang có dấu:** Đây là một vấn đề thật sự nan giải, nó giải quyết các vấn đề như sự đồng bộ hóa giữa các từ, tuy nhiên nó cũng khiến phát sinh các vấn đề bên lề. Cụ thể nhóm em xử lí như sau:
+| Cột | Ý nghĩa |
+|-----|---------|
+| `id` | Khóa chính, mã định danh của đánh giá |
+| `review` | Nội dung đánh giá của khách hàng |
+| `rating` | Số sao khách hàng cho sản phẩm $(1$–$5)$ |
+| `label` | Nhãn cảm xúc thực sự (positive / negative) |
+
+Một số đặc điểm đáng chú ý của bộ dữ liệu gốc:
+
+- Không có giá trị null và không có dòng trùng lặp.
+- Độ dài review dao động từ 20 đến 2,021 ký tự.
+- Dữ liệu chứa ký tự đặc biệt, emoji, từ sai chính tả và từ bị kéo dài ký tự.
+
+#### 3.2. Phân tích & Khám phá dữ liệu (EDA)
+
+Quá trình EDA tập trung vào ba nhóm phân tích chính: **phân bố nhãn**, **phân bố rating** và **khả năng phân tách đặc trưng văn bản**. Các biểu đồ dưới đây được dùng để làm rõ các nhận xét định lượng trong phần này.
+
+**Biểu đồ 1. Không gian đặc trưng TF-IDF của tập Shopee gốc**
+
+![t-SNE Projection of Review TF-IDF Features - Shopee Dataset](figures/tsne_feature_separability.png)
+
+Biểu đồ t-SNE cho thấy hai nhóm cảm xúc **Positive** và **Negative** có xu hướng phân bố theo vùng nhưng **vẫn chồng lấn đáng kể**, đặc biệt ở khu vực trung tâm. Điều này cho thấy đặc trưng TF-IDF đã chứa tín hiệu phân biệt cảm xúc nhất định, nhưng chưa đủ mạnh để tách hai lớp thành hai cụm hoàn toàn độc lập. Với dữ liệu thực tế, hiện tượng chồng lấn này là hợp lý vì nhiều review có nội dung ngắn, dùng từ trung tính hoặc chứa cả yếu tố khen và chê trong cùng một câu.
+
+**Biểu đồ 2. Không gian đặc trưng TF-IDF của tập dữ liệu tăng cường**
+
+![t-SNE Projection of Review TF-IDF Features - Augmented Dataset](figures/tsne_feature_separability_aug.png)
+
+So với tập Shopee gốc, biểu đồ t-SNE của tập tăng cường cho thấy hai lớp được **phân tách rõ hơn theo trục dọc**. Nhãn **Positive** tập trung nhiều hơn ở nửa trên, trong khi nhãn **Negative** tập trung nhiều hơn ở nửa dưới. Điều này gợi ý rằng quá trình tăng cường lọc và dữ liệu đã làm giảm nhiễu và giúp mối quan hệ giữa nội dung review và nhãn cảm xúc trở nên nhất quán hơn.
+
+**Biểu đồ 3. Phân phối nhãn cảm xúc**
+
+![Class Distribution](figures/class_distribution.png)
+
+Đối với tập Shopee gốc, nhãn **Negative** chiếm ưu thế với khoảng **5.965 mẫu**, trong khi nhãn **Positive** có khoảng **3.634 mẫu**. Nhóm tiêu cực chiếm khoảng $62\%$ tổng số mẫu, cho thấy **dữ liệu có mất cân bằng nhãn ở mức vừa phải**. Mức lệch này có thể khiến mô hình thiên về lớp Negative nếu không được đánh giá bằng các chỉ số theo từng lớp như Precision, Recall và F1-score. Ở tập tăng cường, số lượng hai lớp gần cân bằng hơn (**677 Negative** và **671 Positive**), giúp giảm rủi ro mô hình học lệch về một lớp.
+
+**Biểu đồ 4. Phân phối số sao đánh giá**
+
+![Rating Distribution](figures/rating_distribution.png)
+
+Phân phối rating cho thấy dữ liệu có đặc trưng phổ biến của đánh giá thương mại điện tử: **số lượng đánh giá tập trung mạnh ở hai cực** 1 sao và 5 sao. Các mức 2, 3 và 4 sao ít hơn, phản ánh rằng khách hàng thường để lại phản hồi rõ ràng khi rất hài lòng hoặc rất không hài lòng. Tập tăng cường vẫn giữ được hình dạng phân phối tương tự tập gốc, cho thấy quá trình lấy mẫu không làm thay đổi đáng kể cấu trúc rating ban đầu.
+
+**Biểu đồ 5. Mối quan hệ giữa rating và nhãn cảm xúc**
+
+![Relationship between Rating and Sentiment Label](figures/label_by_rating_distribution.png)
+
+Biểu đồ mối quan hệ giữa rating và nhãn cho thấy tập Shopee gốc có hiện tượng ****nhiễu nhãn** *(label noise)***, đặc biệt ở các mức 3 sao và 4 sao. Một số review có rating tương đối cao nhưng vẫn mang nhãn Negative, hoặc ngược lại. Nguyên nhân có thể đến từ việc người dùng đánh giá sao không hoàn toàn nhất quán với nội dung bình luận, hoặc nội dung review chứa nhiều khía cạnh trái chiều. Ở tập tăng cường, **quan hệ giữa rating và label rõ ràng hơn**: rating thấp chủ yếu gắn với Negative, rating cao chủ yếu gắn với Positive. Đây là tín hiệu cho thấy tập tăng cường phù hợp hơn để huấn luyện mô hình phân loại nhị phân.
+
+---
+
+## PHẦN 2: XỬ LÝ DỮ LIỆU VÀ TRÍCH XUẤT ĐẶC TRƯNG
+
+### 1. Tiền xử lý dữ liệu (Data Preprocessing)
+
+Tiền xử lý dữ liệu là bước quan trọng nhằm biến văn bản thô thành dữ liệu đầu vào ổn định hơn cho mô hình. Trong dự án, nhóm chia hướng xử lý thành hai nhánh:
+
+- **Nhánh cho mô hình baseline** như Logistic Regression, Naive Bayes và SVM: cần làm sạch và chuẩn hóa kỹ hơn để TF-IDF tạo đặc trưng ít nhiễu.
+- **Nhánh cho mô hình học sâu** như LSTM và PhoBERT: cần giữ lại nhiều thông tin ngữ cảnh hơn, tránh loại bỏ quá mức các tín hiệu có thể liên quan đến cảm xúc.
+
+#### 1.1. Làm sạch văn bản
+
+Bước làm sạch văn bản tập trung vào việc loại bỏ những thành phần không cần thiết hoặc gây nhiễu cho mô hình. Các thao tác chính gồm:
+
+- **Chuẩn hóa khoảng trắng:** Loại bỏ các khoảng trắng thừa, ký tự lặp không cần thiết.
+- **Chuyển đổi emoji:** Thay thế các emoji phổ biến bằng các nhãn chữ (`positive_emoji`, `negative_emoji`, v.v.) để giữ lại thông tin cảm xúc mà emoji mang lại.
+- **Loại bỏ nội dung không liên quan:** Xóa các URL, thẻ HTML và địa chỉ email được đính kèm trong review.
+
+Riêng với nhánh Baseline, thêm hai bước:
+
+- Chuyển toàn bộ văn bản về chữ thường.
+- Loại bỏ dấu câu.
+
+Sau bước này, dữ liệu văn bản trở nên nhất quán hơn, giúp **giảm kích thước từ vựng** và hạn chế việc mô hình xem các biến thể không cần thiết là những token hoàn toàn khác nhau.
+
+#### 1.2. Chuẩn hóa văn bản
+
+Chuẩn hóa văn bản nhằm đưa các biến thể biểu đạt về dạng thống nhất hơn. Với dữ liệu đánh giá Shopee tiếng Việt, bước này đặc biệt cần thiết vì người dùng thường viết không theo chuẩn chính tả hoặc dùng ngôn ngữ mạng xã hội.
+
+Các thao tác chuẩn hóa gồm:
+
+- **Chuẩn hóa từ bị kéo dài:** Các từ có từ $3$ ký tự lặp trở lên sẽ được rút gọn về $2$ ký tự (ví dụ: `đẹppppp` → `đẹpp`). Ngưỡng $3$ ký tự được chọn để tránh nhầm lẫn với các từ tiếng Anh hợp lệ như `free`, `good`, đồng thời vẫn giữ lại một phần thông tin cảm xúc mà sự lặp ký tự thể hiện.
+- **Chuẩn hóa từ viết tắt và slang:** Sử dụng bảng ánh xạ các từ lóng phổ biến về dạng văn bản đầy đủ (ví dụ: `sp` → `sản phẩm`, `ok` → `được`).
+- **Phục hồi từ không dấu:** Đây là bài toán khó nhất trong bước này. Phương pháp nhóm thực hiện:
     - Duyệt qua các từ trong tập dữ liệu. Với mỗi từ ta lưu lại tần suất nghĩa gốc sau đó chuyển về dạng không dấu. Ví dụ: Gặp từ `bạn` -> chuyển thành `ban`  -> đếm ` bạn` ứng với ` ban ` một lần 
-    - Chọn từ có tần suất cao nhất trong cùng dạng. Ví dụ trong các từ `ban` thì từ `bạn` có tần suất cao nhất lưu lại qua `restore_map`.
+    - Chọn từ có **tần suất cao nhất** trong cùng dạng. Ví dụ trong các từ `ban` thì từ `bạn` có **tần suất cao nhất** lưu lại qua `restore_map`.
     - Xử lí từng cụm. Ví dụ như `chat luong` sẽ đổi sang thành ` chất lượng `.
     - Tách câu và kiểm tra từng từ đơn, nếu từ đã có dấu thì giữ nguyên, nếu không dấu thì dò trong ` restore map ` rồi đổi.
-<br>
 
-Riêng đối với bộ dữ liệu dành cho các mô hình baseline, ta cần loại bỏ các stopword để giảm noise và tăng hiệu suất lưu trữ. Bộ stopword được tải về từ link: https://stopwords.github.io/vietnamese-stopwords/ của tác giả Le Van Duyet.
+Riêng đổi với bộ dữ liệu dành cho các mô hình baseline, ta cần loại bỏ các `stopword` để giảm noise và tăng hiệu suất lưu trữ. Bộ stopword được tải về từ link: https://stopwords.github.io/vietnamese-stopwords/ của tác giả Le Van Duyet.
+Mục tiêu của bước chuẩn hóa không phải là làm mất hoàn toàn phong cách biểu đạt của người dùng, mà là giảm nhiễu để mô hình học được các mẫu cảm xúc tổng quát hơn.
 
-#### 3/ Segmentation & Tokenize:
-- Vì đặc thù của tiếng Việt, một vài từ cần có nhau thì mới có được ý nghĩa. Vậy, để ghép các từ đơn chiếc lại, bọn em dùng các thư viện chuyên xử lí tiếng Việt đã có sẵn như underthesea, pyvi để phân đoạn các từ. Sau đó lưu lại vào folder tạm dành cho xử lí các phần sau.
-- Tương tự, để mã hóa các từ trong reviews, nhóm cũng tận dụng tối đa nguồn trí lực dồi dào của các bậc tiền bối bằng cách tận dụng luôn các thư viện như sklearn để tách các từ với nhau, chuẩn bị cho máy học.
+#### 1.3. Tách từ tiếng Việt
 
-## Phần 2: Máy móc bumchacalaca
-Vì đây là bài toán phân loại, đánh giá có tích cực hay không, nhóm em thử nghiệm trên các mô hình chính như sau:
-- Deep Learning:
-  - LSTM
-  - PhoBERT của VinAI
+Do tiếng Việt có nhiều từ đa âm tiết được viết cách nhau bằng khoảng trắng, **tách từ là bước quan trọng** trước khi vector hóa văn bản. Ví dụ, cụm `tuyệt vời` cần được xem như một đơn vị nghĩa thay vì hai token rời rạc `tuyệt` và `vời`.
 
-- Baseline (ML):
-  - Logistic Regression
-  - Naive Bayes
-  - SVM
+Trong dự án, nhóm thử nghiệm các công cụ tách từ tiếng Việt như **Underthesea** và **PyVi**. Kết quả tách từ được sử dụng cho các bước trích xuất đặc trưng và mô hình hóa phía sau, đặc biệt là với TF-IDF và các embedding dựa trên từ.
 
+#### 1.4. Tokenization
 
-### 1. Feature Engineer
-
-
-Sau bước tiền xử lý, dữ liệu văn bản đã được làm sạch và phân tách từ. Tuy nhiên, các thuật toán Machine Learning không thể làm việc trực tiếp với chuỗi ký tự mà chỉ xử lý được dữ liệu dạng số. Do đó, bước Feature Engineering được thực hiện nhằm chuyển đổi văn bản thành các vector số mang thông tin ngữ nghĩa, tạo đầu vào cho các mô hình học máy và học sâu.
+Nhóm sử dụng thư viện `sklearn` để tokenize và chuyển văn bản thành dạng số phục vụ các mô hình Machine Learning. Với các mô hình Deep Learning, tokenizer tương ứng của từng kiến trúc được sử dụng (PhoBERT Tokenizer của VinAI cho PhoBERT).
 
 ---
 
-### 1.1 TF-IDF
+### 2. Trích xuất đặc trưng (Feature Engineering)
 
-### Bước thực hiện
+Sau bước tiền xử lý, dữ liệu văn bản đã được làm sạch và phân tách từ. Tuy nhiên, **các thuật toán Machine Learning không thể làm việc trực tiếp với chuỗi ký tự** mà chỉ xử lý được dữ liệu dạng số. Do đó, bước Feature Engineering được thực hiện nhằm chuyển đổi văn bản thành các vector số mang thông tin ngữ nghĩa, tạo đầu vào cho các mô hình học máy và học sâu.
 
-* Xây dựng tập từ vựng từ toàn bộ dữ liệu.
-* Tính giá trị TF (Term Frequency) cho từng từ trong mỗi văn bản, dựa trên giả định từ xuất hiện càng nhiều trong document thì càng quan trọng => TF gần 1 thì quan trọng
-* Tính giá trị IDF (Inverse Document Frequency) dựa trên toàn bộ tập dữ liệu, với ý tưởng rằng một từ xuất hiện ở quá nhiều document khác nhau thì ít có khả năng phân biệt các document => IDF lớn thì có tính phân biệt cao
-* Tạo vector TF-IDF biểu diễn mỗi văn bản bằng cách tính TF*IDF.
+#### 2.1. TF-IDF
 
-TF-IDF biểu diễn một văn bản thông qua mức độ quan trọng của các từ xuất hiện trong văn bản đó. Những từ xuất hiện nhiều trong một văn bản nhưng ít xuất hiện trong toàn bộ tập dữ liệu sẽ được gán trọng số cao hơn.
+**TF-IDF (Term Frequency - Inverse Document Frequency)** là phương pháp biểu diễn văn bản bằng trọng số của từ. Phương pháp này kết hợp hai yếu tố:
 
+- **TF:** mức độ xuất hiện của một từ trong một văn bản.
+- **IDF:** mức độ hiếm của từ đó trong toàn bộ tập dữ liệu.
 
-Mỗi văn bản được chuyển thành một vector đặc trưng có kích thước cố định.
+Một từ xuất hiện nhiều trong một văn bản nhưng ít xuất hiện trong toàn bộ corpus sẽ có trọng số cao hơn, vì từ đó có khả năng mang thông tin phân biệt tốt hơn. Trong dự án, TF-IDF được sử dụng làm đặc trưng đầu vào cho các mô hình baseline gồm Logistic Regression, Naive Bayes và SVM.
 
-### Ý nghĩa
+**Ưu điểm:** Giảm ảnh hưởng của các từ phổ biến nhưng ít ý nghĩa (như `và`, `là`), cải thiện so với Bag-of-Words thuần túy.
 
-* Giảm ảnh hưởng của những từ xuất hiện quá phổ biến.
-* Tăng trọng số cho các từ mang nhiều thông tin hơn.
-* Giải quyết được điểm yếu của Bag of Words khi phản ánh được độ quan trọng của từ qua các trọng số.
+**Hạn chế:** Không nắm bắt được quan hệ ngữ nghĩa giữa các từ (từ đồng nghĩa được biểu diễn như hai thực thể độc lập), không lưu giữ thứ tự từ, và kém hiệu quả khi mở rộng sang tập dữ liệu lớn.
 
-Hạn chế:
+#### 2.2. Word2Vec
 
-* Không nắm bắt được ý nghĩa ngữ nghĩa giữa các từ. Ví dụ như sự mơ hồ của các từ đồng âm, từ đa nghĩa, cần thêm các từ khác để có được nghĩa rõ ràng. TF-IDF chỉ hiểu `yếu` trong `điểm yếu` và `yếu` trong `yếu điểm` là một.
-* Không hiểu được những từ khác nhau nhưng gần nghĩa, ví dụ `tốt` và `tuyệt vời`. Do đó TF-IDF sẽ cho ra các vector khác nhau cho những câu có nghĩa gần giống nhau.
-* Chưa khắc phục được những điểm yếu của Bag of Words về mất thứ tự từ và khả năng mở rộng cho tập dữ liệu lớn rất kém.
+Word2Vec học biểu diễn vector cho từng từ dựa trên ngữ cảnh xuất hiện — các từ có ngữ cảnh giống nhau sẽ có vector gần nhau trong không gian ngữ nghĩa. Mô hình huấn luyện một mạng nơ-ron nông và sử dụng lớp ẩn (embedding layer) làm vector biểu diễn. Vector câu được tạo bằng cách lấy trung bình *(Average Pooling)* các vector từ.
 
----
+**Ưu điểm:** Biểu diễn được mối quan hệ ngữ nghĩa giữa các từ, giảm số chiều đặc trưng so với TF-IDF.
 
-### 1.2 Word2Vec
+**Hạn chế:** Xử lý kém các từ hiếm và rất nhạy với lỗi chính tả hoặc biến thể từ. Mỗi từ chỉ có một vector duy nhất, không phân biệt được đa nghĩa theo ngữ cảnh.
 
-### Bước thực hiện
+#### 2.3. FastText
 
-Ý tưởng chính: **các từ xuất hiện trong các ngữ cảnh giống nhau thì có nghĩa giống nhau**. Word2Vec sẽ học 2 nhiệm vụ phụ: dự đoán từ dựa trên ngữ cảnh hoặc dự đoán ngữ cảnh dựa trên từ. Các bước thực hiện có thể giản lược như sau:
-* Tạo dictionary vocabulary và tách mỗi câu thành 1 one-hot vector dựa trên dictionary đó.
-* Huấn luyện 1 mô hình neural network đơn giản trên toàn bộ tập dữ liệu. Trong đó, kiến trúc sẽ là input layer - embedding layer (hidden layer) - output layer. 
-* Sau khi huấn luyện sẽ có được các trọng số của hidden layer, ta sẽ dùng nó để biến đổi bất kỳ từ nào trong dictionary vocabulary.
-* Sau đó, các vector của từng từ được tổng hợp lại bằng Average Pooling (lấy trung bình của các vector) để tạo thành vector biểu diễn cho toàn bộ câu hoặc văn bản.
+FastText mở rộng ý tưởng của Word2Vec bằng cách phân tích từ thành các chuỗi ký tự con *(character n-grams)*. Vector của một từ được tổng hợp từ các vector n-gram thành phần, giúp mô hình học được cấu trúc bên trong của từ.
 
-### Ý nghĩa
+**Ưu điểm:** Tạo vector tốt hơn cho từ hiếm và từ bị sai chính tả — một ưu điểm quan trọng với dữ liệu mạng xã hội tiếng Việt. Khắc phục được điểm yếu của Word2Vec với các biến thể từ.
 
-Word2Vec học mối quan hệ ngữ nghĩa giữa các từ thông qua ngữ cảnh xuất hiện của chúng. Từ đó:
-* Biểu diễn được ý nghĩa ngữ nghĩa của từ.
-* Giảm số chiều đặc trưng so với TF-IDF.
-* Giúp các từ có ý nghĩa tương tự được biểu diễn gần nhau.
+**Hạn chế:** Vẫn mất thứ tự từ khi dùng trung bình vector. Không giải quyết được vấn đề đa nghĩa vì một từ vẫn chỉ tạo ra một nhóm vector.
 
-Hạn chế:
-
-* Không xử lý tốt từ hiếm. Các vector hiếm sẽ không được học đủ để ảnh hưởng nhiều lên trọng số nên vector đầu ra sẽ khó để thể hiện các từ hiếm. 
-* Không hiểu cấu trúc bên trong của từ, do đó rất nhạy với lỗi chính tả, viết tắt, thiếu dấu hay các ký tự lặp kéo dài. Nếu preprocess không đủ tốt thì Word2Vec không xử lý được.
-* Chưa khắc phục được điểm yếu của TF-IDF về sự mơ hồ của từ đa nghĩa, mất thông tin về thứ tự từ.
-
----
-
-### 1.3 FastText
-
-### Bước thực hiện
-
-Khác với Word2Vec, FastText không coi một từ là đơn vị độc lập mà phân tích từ thành nhiều chuỗi ký tự nhỏ hơn. Ý tưởng chính là một từ là tập hợp của nhiều mảnh ký tự nhỏ hơn (character n-grams). Ví dụ: `tốt` được biểu diễn thông qua nhiều character n-grams.
-
-* Tách văn bản thành các từ. Các từ được biến đổi thành nhiều vector n-grams có hình dáng gần giống nhau.
-* Huấn luyện mô hình neural network FastText tương tự như Word2Vec trên toàn bộ tập dữ liệu, chỉ khác là input layer là các vector n-grams.
-* Dùng kết quả từ neural network ở trên để sinh vector biểu diễn cho từng từ.
-* Tính trung bình các vector từ để tạo vector biểu diễn cho toàn bộ văn bản.
-
-### Ý nghĩa
-
-
-* Tạo vector tốt hơn cho những từ ít xuất hiện hoặc bị sai chính tả. Từ đó, khắc phục hạn chế của Word2Vec đối với các từ hiếm, từ bị lỗi.
-* Hoạt động tốt trên dữ liệu tiếng Việt và dữ liệu mạng xã hội.
-* Không còn quá nhạy với lỗi chính tả và các biến thể của từ.
-
-Hạn chế:
-
-* Vẫn làm mất thứ tự từ khi sử dụng trung bình vector.
-* Không giải quyết được vấn đề đa nghĩa vì một từ thì chỉ sinh ra những vector gần giống. Nhưng ví dụ như từ `yếu` khi trong ngữ cảnh khác nhau sẽ có nghĩa hoàn toàn trái ngược, nên cần 2 vector khác nhau.
-
----
-
-### Kết quả đầu ra
-
-Sau bước Feature Engineering, mỗi văn bản được chuyển đổi thành một vector đặc trưng có kích thước cố định.
-
-Các vector này sẽ được sử dụng làm đầu vào cho các mô hình học máy như:
-
-* Logistic Regression
-* Naive Bayes
-* Support Vector Machine
-
-hoặc làm đầu vào cho các mô hình học sâu như:
-
-* LSTM
-* Transformer
-* PhoBERT
+#### 2.4. Kết quả đầu ra
+Sau bước Feature Engineering, mỗi văn bản được chuyển đổi thành một vector đặc trưng có kích thước cố định. Các vector này sẽ được sử dụng làm đầu vào cho các mô hình học máy như: Logistic Regression, Naive Bayes, Support Vector Machine hoặc làm đầu vào cho các mô hình học sâu như LSTM, Transformer, PhoBERT
 
 Nhờ đó, mô hình có thể học được các mẫu dữ liệu và thực hiện nhiệm vụ phân loại cảm xúc trên các đánh giá của khách hàng.
 
 ---
 
-### 2. Baseline Model
+## PHẦN 3: XÂY DỰNG VÀ ĐÁNH GIÁ MÔ HÌNH
+
+### 1. Các mô hình đã triển khai
+
+Nhóm thử nghiệm trên tổng cộng năm mô hình, chia làm hai nhóm: 
+- Nhóm Baseline (Machine Learning): Logistic Regression, SVM, Naive Bayes.
+- Nhóm Deep Learning: Bidirectional LSTM, PhoBERT.
+
+#### 1.1. Nhóm Baseline (Machine Learning)
 
 Ở các model baseline, nhóm chỉ dùng kết quả của TF-IDF để train model, chưa dùng tới các kết quả nâng cao hơn.
 
-### 2.1 Logistic Regression
-
-### Thuật toán
+**1. Logistic Regression**
 
 Thuật toán của Logistic Regression có thể hiểu đơn giản là *dùng thuật toán Linear Regression và biến đổi đầu ra bằng hàm Sigmoid (hoặc Softmax) để đưa ra kết quả classification*. Cụ thể tuần tự các bước là:
-* Khởi tạo các trọng số W
-* Tính một siêu phẳng mô tả tất cả các điểm dữ liệu
-* Dùng hàm sigmoid để chuyển kết quả của siêu phẳng thành một xác suất thuộc vào class nào. Vì đây là bài toán binary classification nên dùng hàm sigmoid, kết quả trả về là một giá trị xác suất **p** thuộc khoảng [0;1]. Cho threshold là 0.5 thì khi **p>0.5, điểm dữ liệu thuộc class 1** và ngược lại 
-* So sánh với label để tính loss và dùng Gradient Descent để cập nhật trọng số W
-* Tiếp tục cho đến khi đạt điều kiện dừng là hàm mục tiêu hội tụ hoặc dừng sớm (chạy đủ số epoch hoặc loss đủ nhỏ)
+- Khởi tạo các trọng số W
+- Tính một siêu phẳng mô tả tất cả các điểm dữ liệu
+- Dùng hàm sigmoid để chuyển kết quả của siêu phẳng thành một xác suất thuộc vào class nào. Vì đây là bài toán binary classification nên dùng hàm sigmoid, kết quả trả về là một giá trị xác suất **p** thuộc khoảng $[0;1]$. Cho threshold là 0.5 thì khi **$p > 0.5$, điểm dữ liệu thuộc class 1** và ngược lại 
+- So sánh với label để tính loss và dùng Gradient Descent để cập nhật trọng số W
+- Tiếp tục cho đến khi đạt điều kiện dừng là hàm mục tiêu hội tụ hoặc dừng sớm (chạy đủ số epoch hoặc loss đủ nhỏ)
 
+**Kết quả đánh giá:**
 
-### Đánh giá
-
+**Bảng các thông số đánh giá**
 | Class | Precision | Recall | F1-score |
-| :--- | :---: | :---: | :---: |
-| negative | 0.95 | 0.92 | 0.93 |
-| positive | 0.88 | 0.92 | 0.90 |
+|------|-----------|--------|----------|
+| Negative | $0.95$ | $0.92$ | $0.93$ |
+| Positive | $0.88$ | $0.92$ | $0.90$ |
 
+**Ma trận nhầm lẫn**  
 
-Kết quả các metric trả về rất tốt dù chỉ mới là baseline
-=> Bộ dữ liệu không thật sự mang tính đại diện, vì dữ liệu thực tế của bài toán NLP không dễ gì mà đạt kết quả cao như vậy chỉ với baseline, nếu không thì đã chẳng cần tới các kỹ thuật Deep Learning.
+![alt text](figures/baseline_log_confma.png)  
 
 Dựa trên thuật toán của Logistic Regression và TF-IDF có thể nhận xét:
-* Dù số chiều của matrix mà TF-IDF trả về là rất lớn nhưng model vẫn được train rất nhanh. Lý do là vì các vector đặc trưng phần lớn là các giá trị 0, rất thưa, nên không ảnh hưởng tốc độ tính toán của model.
-* Model Logistic Regression có tính giải thích được vì kết quả trả về là một giá trị xác suất, dựa vào đó ta quyết định classify điểm dữ liệu tùy vào threshold được chọn.
-* Model vẫn có các điểm yếu chưa khắc phục được từ phần trước đã nêu, đó là không học được thứ tự từ, ngữ nghĩa và ngữ cảnh của câu.
-* Ngoài ra, do train dựa trên giả sử về mối quan hệ tuyến tính của các feature nên model không thể học các mối quan hệ phức tạp.
 
----
+- Dù số chiều của matrix mà TF-IDF trả về là rất lớn nhưng model vẫn được train rất nhanh. Lý do là vì các vector đặc trưng phần lớn là các giá trị 0, rất thưa, nên không ảnh hưởng tốc độ tính toán của model.
+- Model Logistic Regression có tính giải thích được vì kết quả trả về là một giá trị xác suất, dựa vào đó ta quyết định classify điểm dữ liệu tùy vào threshold được chọn.
+- Model vẫn có các điểm yếu chưa khắc phục được từ phần trước đã nêu, đó là **không học được thứ tự từ, ngữ nghĩa và ngữ cảnh của câu**.
+- Ngoài ra, do train dựa trên giả sử về mối quan hệ tuyến tính của các feature nên model không thể học các mối quan hệ phức tạp.
 
-### 2.2 Naive Bayes
+Tóm lại, mô hình đạt kết quả tốt, huấn luyện nhanh nhờ đặc trưng TF-IDF thưa *(sparse)*. Tuy nhiên, bị giới hạn bởi giả định tuyến tính và không học được thứ tự từ hay ngữ cảnh câu.
 
-### Thuật toán
+**2. Naive Bayes**
 
 Thuật toán Naive Bayes hoạt động dựa trên giả sử về tính độc lập của các feature. Thuật toán xem các feature là hoàn toàn độc lập với nhau để tính xác suất có điều kiện theo định lý Bayes. Cụ thể:
-* Tính xác suất xảy ra của từng class
-* Tính xác suất mỗi từ xuất hiện trong từng class
-* Khi predict một review, model tính xác suất có điều kiện cho class 0 và class 1. Nói cách khác, khi có các từ như trong review xuất hiện thì xác suất thuộc class 1 (hay 0) là bao nhiêu. Xác suất class nào lớn hơn thì review sẽ thuộc class đó.
+- Tính xác suất xảy ra của từng class
+- Tính xác suất mỗi từ xuất hiện trong từng class
+- Khi predict một review, model tính xác suất có điều kiện cho class 0 và class 1. Nói cách khác, khi có các từ như trong review xuất hiện thì xác suất thuộc class 1 (hay 0) là bao nhiêu. Xác suất class nào lớn hơn thì review sẽ thuộc class đó.
 
-### Đánh giá
-
-| Class | Precision | Recall | F1-score |
-| :--- | :---: | :---: | :---: |
-| negative | 0.96 | 0.87 | 0.91 |
-| positive | 0.82 | 0.94 | 0.88 |
-
-Đánh giá về metric thì tương tự như Logistic Regression.
-
-Dựa trên thuật toán ta có thể có một số nhận xét:
-* Đây là **model train nhanh nhất** trong tất cả các model mà nhóm sử dụng. Lý do là vì model không có learnable parameters mà chỉ là thuần tính toán các phép nhân chia.
-* Các điểm về tính giải thích được và điểm yếu chưa thể khắc phục thì Naive Bayes khá giống với Logistic Regression (dù lý do đằng sau thì khác nhau).
-* Ngoài ra, việc giả định tính độc lập giữa các feature là không tốt vì các từ thường phụ thuộc nhau để quyết định nghĩa cả câu.
-
----
-
-### 2.3 Support Vector Machine
-
-### Thuật toán
-
-SVM cố gắng tìm một siêu phẳng để phân chia các class trong không gian dữ liệu (decision boundary). Ta tìm sao cho khoảng cách từ siêu phẳng đến các điểm gần nhất của mỗi class là lớn nhất. Thuật toán cụ thể:
-* Khởi tạo siêu phẳng ngẫu nhiên
-* Tìm các support vector (những điểm gần đường phân chia nhất)
-* Điều chỉnh siêu phẳng sao cho khoảng cách giữa siêu phẳng và các support vector là lớn nhất
-* Lặp lại cho đến khi tìm được siêu phẳng tối ưu
-* Khi predict một review, input vector sẽ được đưa vào phương trình của siêu phẳng. Nếu kết quả dương thì thuộc class 1, kết quả âm thì thuộc class 0.
-
-### Đánh giá
+**Kết quả đánh giá:**
+**Bảng các thông số đánh giá**  
 
 | Class | Precision | Recall | F1-score |
 | :--- | :---: | :---: | :---: |
-| negative | 0.96 | 0.92 | 0.94 |
-| positive | 0.88 | 0.94 | 0.91 |
-
-Kết quả metric tốt nhất trong cả 3 baseline model. Mặc dù chưa tune hyperparameter nhưng model đã đạt kết quả rất cao, càng khẳng định giả định về tính đại diện thấp của bộ dữ liệu là đúng.
-
-Nhận xét:
-* SVM khó giải thích hơn 2 model trên vì nó không trả về một xác suất thuộc vào một class.
-* Model có tính chính xác cao, có thể là cao nhất trong 3 model baseline.
-* Không học được thứ tự từ, ngữ cảnh, train chậm khi dữ liệu lớn.
-
-### Mô hình Long Short-Term Memory (LSTM):
-#### 1/ LSTM là gì vậy nhỉ? Một lời giới thiệu.
-- LSTM là một mô hình học sâu thừa hưởng từ RNNs (Recurrent Neural Networks) chuyên xử lí các bài toán có tính tuần tự liên tục, thông qua các dữ kiện diễn ra trước để đoán kết quả diễn ra sau. Vậy ta tự hỏi phân tích chữ thì liên quan gì đến tuần tự? Để giải đáp câu hỏi này, ta cứ nghĩ máy sẽ "đọc" từng chữ từng chữ rồi đưa ra phân tích, cứ như cách con người đọc vậy thôi. 
-- LSTM là một chuỗi các khối (cells) được cấu tạo từ 3 phần chính: cổng quên, cổng đầu vào, cổng ra. Ta hiểu mỗi một cell sẽ đánh giá một chữ, đưa input vào tạo thông tin mới, thừa hưởng thông tin từ cell trước (trừ cell đầu tiên) rồi xuất thông tin đạt được ra.
-
-![alt text](figures/LSTM_la_gi.jpg)
-
-<div align="center" style="font-weight: bold"> Hình cấu tạo của một cell. Link: https://vnptai.io/storage/thumbnail/LSTM-la-gi.jpg </div>
-
-<br>
-
-#### 2/ Cài đặt mô hình
-Nhóm em cài đặt mạng mô hình Bidirectional LSTM sử dụng thư viện pytorch và thừa hưởng các hàm đã có:
-- Khởi tạo mô hình:
-
-```python
-def __init__(self, vocab_size=64001, embedding_dim=128, hidden_dim=256, output_dim=1, n_layers=2):
-  super().__init__()
-        
-  # 1. Tầng nhúng từ (Embedding Layer) - Nhận ma trận 2D [Batch, 128] -> Trả về 3D [Batch, 128, 128]
-  # padding_idx=1 (Bỏ hết pad_idx = 1) vì PhoBERT Tokenizer của VinAI quy ước ID số 1 là ký tự đệm (Pad) để đáp ứng đủ độ dài chuỗi      
-  self.embedding = nn.Embedding(vocab_size, embedding_dim, padding_idx=1)      
-        
-  # 2. Tầng mạng hồi quy LSTM 2 chiều (Bidirectional LSTM)
-  self.lstm = nn.LSTM(embedding_dim, 
-                      hidden_dim,  # Nhận vào vector kích thước 128, đầu ra tại mỗi bước thời gian là một vector ngữ cảnh kích thước 256
-                      num_layers=n_layers, 
-                      batch_first=True, # Đảm bảo input: [Batch, Seq_len, Embed_dim]
-                      bidirectional=True, # Học ngữ cảnh xuôi và ngược
-                      dropout=0.3 if n_layers > 1 else 0.0) # dropout giúp chống học vẹt, ngắt ngẫu nhiên 30% neuron giữa các tầng để có thể huấn luyện bền vững hơn
-        
-  # 3. Tầng tuyến tính phân loại đầu ra (Fully Connected)
-  # Nhân đôi hidden_dim vì cơ chế Bidirectional gộp kết quả chiều xuôi + chiều ngược lại với nhau
-  self.fc = nn.Linear(hidden_dim * 2, output_dim)
-  self.sigmoid = nn.Sigmoid()      # Hàm kích hoạt để ép số về khoảng từ [0,1]
-```
-- Lan truyền thuận (Forward Prop):
-```python
-def forward(self, text):
-  # text shape đầu vào: [batch_size, sequence_length] (Ví dụ: [64, 128])
-  embedded = self.embedding(text) # shape sau embedding: [batch_size, 128, 128]
+| negative | $0.96$ | $0.87$ | $0.91$ |
+| positive | $0.82$ | $0.94$ | $0.88$ |
   
-  # Chạy qua mạng LSTM
-  lstm_out, (hidden, cell) = self.lstm(embedded)
+**Ma trận nhầm lẫn**  
+![alt text](figures/baseline_naive_confma.png)  
+
+Dựa trên kết quả thuật toán ta có thể có một số nhận xét:
+- Đây là ****model train nhanh nhất**** trong tất cả các model mà nhóm sử dụng. Lý do là vì model không có learnable param mà chỉ là thuần tính toán các phép nhân chia.
+- Các điểm về tính giải thích được và điểm yếu chưa thể khắc phục thì Naive Bayes khá giống với Logistic Regression (dù lý do đằng sau thì khác nhau).
+- Ngoài ra, **việc giả định tính độc lập giữa các feature là không tốt** vì các từ thường phụ thuộc nhau để quyết định nghĩa cả câu.
+
+Tóm lại, dây là mô hình huấn luyện nhanh nhất do không có tham số học được. Điểm yếu lớn nhất là giả định độc lập giữa các từ — một giả định không thực tế với ngôn ngữ tự nhiên, nơi các từ thường phụ thuộc nhau để tạo thành nghĩa. Qua đó kết quả thống kê đạt được trong bài toán này không tốt như hai mô hình baseline còn lại.
+
+**3. Support Vector Machine (SVM)**
+
+SVM cố gắng tìm một siêu phẳng để phân chia các class trong không gian dữ liệu *(decision boundary)*. Ta tìm sao cho khoảng cách từ siêu phẳng đến các điểm gần nhất của mỗi class là lớn nhất. Thuật toán cụ thể:
+- Khởi tạo siêu phẳng ngẫu nhiên
+- Tìm các support vector (những điểm gần đường phân chia nhất)
+- Điều chỉnh siêu phẳng sao cho khoảng cách giữa siêu phẳng và các support vector là lớn nhất
+- Lặp lại cho đến khi tìm được siêu phẳng tối ưu
+- Khi predict một review, input vector sẽ được đưa vào phương trình của siêu phẳng. Nếu kết quả dương thì thuộc class 1, kết quả âm thì thuộc class 0.
+
+**Kết quả đánh giá:**
+
+**Bảng các thông số đánh giá**
+| Class | Precision | Recall | F1-score |
+| :--- | :---: | :---: | :---: |
+| negative | $0.96$ | $0.92$ | $0.94$ |
+| positive | $0.88$ | $0.94$ | $0.91$ |
+
+
+**Ma trận nhầm lẫn**  
+![alt text](figures/baseline_SVM_confma.png)  
+
+Dựa trên kết quả thuật toán ta có một số nhận xét:
+- SVM khó giải thích hơn 2 model trên vì **nó không trả về một xác suất** thuộc vào một class.
+- **Model có tính chính xác cao**, có thể là cao nhất trong 3 model baseline.
+- Không học được thứ tự từ, ngữ cảnh, **train chậm khi dữ liệu lớn**.
+
+SVM đạt kết quả tốt nhất trong nhóm Baseline. Mô hình phù hợp với không gian đặc trưng nhiều chiều như TF-IDF, nhưng khó giải thích hơn Logistic Regression vì không trả về xác suất trực tiếp, và huấn luyện chậm hơn khi dữ liệu lớn.
+
+#### 1.2 Nhóm Deep Learning
+
+**4. Bidirectional LSTM**
+
+LSTM (Long Short-Term Memory) là mô hình học sâu phát triển từ kiến trúc RNN, có khả năng ghi nhớ thông tin dài hạn thông qua ba cổng: cổng quên *(Forget Gate)*, cổng đầu vào *(Input Gate)* và cổng đầu ra *(Output Gate)*. Phiên bản Bidirectional cho phép mô hình đọc chuỗi văn bản theo cả hai chiều xuôi và ngược, giúp nắm bắt ngữ cảnh toàn diện hơn.
+
+Kiến trúc mô hình của nhóm gồm: tầng Embedding ($128$ chiều) → Bidirectional LSTM 2 lớp ($256$ units mỗi chiều) với Dropout $0.3$ → tầng Fully Connected → Sigmoid. Mô hình sử dụng hàm mất mát Binary Cross Entropy và bộ tối ưu Adam với learning rate $0.0002$.
+
+![alt text](figures/LSTM_la_gi.png)
+
+**Kết quả huấn luyện (10 epochs):**
+
+![alt text](figures/danhgia_epoch_LSTM.png)
+
+
+Thời gian huấn luyện: ${\sim}57$ giây (trên MPS).
+
+**Kết quả trên tập kiểm thử ($2,190$ mẫu):**
+
+| Nhãn | Precision | Recall | F1-score |
+|------|-----------|--------|----------|
+| Negative | $0.9362$ | $0.9391$ | $0.9376$ |
+| Positive | $0.9055$ | $0.9013$ | $0.9034$ |
+| **Accuracy** | | | **$92.42\%$** |
+
+**Biểu đồ đánh giá hiệu suất mô hình:**
+![alt text](figures/danhgia_1_LSTM.png)
+
+Nhìn chung, mô hình của nhóm làm khá tốt việc đánh giá trải nghiệm của khách hàng. Các chỉ số chung như accuracy: $92.42\%$ là khá tốt. Các chỉ số chi tiết:
+  - **Precision:** Khi mô hình dự đoán một đánh giá là negative thì nó đúng $93.62\%$ số lần và khi dự đoán một đánh giá là positive thì nó đúng $90.55\%$ số lần.
+  - **Recall:** Mô hình nhận diện được $93.91\%$ số câu tiêu cực dựa trên tổng số câu tiêu cực và $90.13\%$ số câu tích cực dựa trên tổng số câu tích cực
+  -  **f1-score:** Điểm số của mô hình khi dự đoán cả hai khía cạnh đều khá ổn
   
-  # Trích xuất hidden state cuối cùng của chiều xuôi (forward) và chiều ngược (backward)
-  hidden_forward = hidden[-2, :, :]
-  hidden_backward = hidden[-1, :, :]
-  
-  # Nối (Concatenate) 2 chiều lại thành một vector ngữ cảnh duy nhất đại diện cho cả câu
-  hidden_concat = torch.cat((hidden_forward, hidden_backward), dim=1) # shape: [batch_size, hidden_dim * 2]
-  
-  # Đưa qua tầng tuyến tính và kích hoạt Sigmoid để tính xác suất (từ 0 đến 1)
-  dense_out = self.fc(hidden_concat)
-  return self.sigmoid(dense_out) # Trả về giá trị xác suất có là Positive hay không
-```
-- Hàm loss:
-```python
-# Dùng Binary Cross Entropy Loss vì đây là bài toán phân loại nhị phân (Positive/Negative)
-criterion = nn.BCELoss()
-```
-- Hàm optimizer:
-```python
-# Dùng Adam Optimizer với learning rate vừa phải để mô hình hội tụ mượt mà
-optimizer = optim.Adam(model.parameters(), lr=0.0002, weight_decay=0.00001)
-```
-#### 3/ Đánh giá mô hình
-Để theo dõi quá trình học rõ hơn, nhóm tách dữ liệu thành `train/validation/test` theo tỷ lệ `70/15/15`. Validation set được dùng để chọn hyperparameter, chọn best epoch và tuning threshold; test set chỉ dùng ở bước đánh giá cuối.
+Nhóm còn thực hiện **Threshold Tuning** nhằm tối ưu Recall cho lớp Negative, vì **bỏ sót đánh giá tiêu cực thường gây hại nhiều hơn** cho doanh nghiệp. Tại ngưỡng $t = 0.66$, mô hình đạt Recall cao hơn đáng kể trên lớp Negative trong khi vẫn duy trì các chỉ số còn lại ở mức chấp nhận được.
 
-Sau khi tuning nhanh một số cấu hình, cấu hình tốt nhất trên validation set là:
+Sự thay đổi của các thông số hiệu suất sau khi tối ưu:
+![alt text](figures/danhgia_2_LSTM.png)
 
-```text
-hidden_dim = 256
-n_layers = 1
-batch_size = 32
-learning_rate = 0.0002
-weight_decay = 0.00001
-```
+**5. PhoBERT Hybrid**
 
-Mô hình final được train với `EPOCHS = 10`, dùng early stopping theo validation loss. Best checkpoint rơi vào **epoch 8/10**, với:
+PhoBERT (`vinai/phobert-base`) là mô hình ngôn ngữ lớn dành riêng cho tiếng Việt, được VinAI phát triển dựa trên kiến trúc RoBERTa. Khác với LSTM xử lý văn bản tuần tự, PhoBERT sử dụng cơ chế Self-Attention của Transformer để xử lý toàn bộ các từ trong câu đồng thời, từ đó nắm bắt được các quan hệ ngữ nghĩa phức tạp giữa các từ ở xa nhau.
 
-```text
-Best validation loss      = 0.2092
-Best validation Macro F1  = 0.9304
-Train time on MPS         = 157.95 seconds
-```
+Để nâng cao hiệu suất, nhóm xây dựng kiến trúc lai (Hybrid) bằng cách kết hợp vector [CLS] của PhoBERT với hai đặc trưng metadata bổ trợ: số sao đánh giá (`rating_stars`) và sự xuất hiện của ảnh/video (`has_media`). Điều này giúp mô hình xử lý tốt hơn các trường hợp văn bản ngắn, mơ hồ hoặc mang tính mỉa mai.
 
-![alt text](figures/lstm_learning_curves.png)
+Kiến trúc: PhoBERT Encoder → vector [CLS] ($768$ chiều) → Concatenate với metadata ($2$ chiều) → FC Layer $(770 \rightarrow 256)$ → ReLU → Dropout $0.3$ → Output (2 nhãn). Mô hình dùng hàm mất mát CrossEntropyLoss và bộ tối ưu AdamW ($lr = 2 \times 10^{-5}$, $\text{weight\_decay} = 0.01$).
 
-![alt text](figures/lstm_mae_by_epoch.png)
+**Kết quả huấn luyện (3 epochs):**
 
-**Nhận xét:** Loss trên tập train giảm đều qua các epoch, cho thấy mô hình học được các đặc trưng cảm xúc trong dữ liệu review. Tuy nhiên sau epoch 8, validation loss không còn cải thiện ổn định trong khi train loss vẫn tiếp tục giảm. Đây là dấu hiệu overfitting nhẹ, nên nhóm chọn checkpoint tốt nhất tại epoch 8 thay vì sử dụng trọng số ở epoch cuối.
+| Epoch | Train Loss | Train Acc | Val Loss | Val Acc |
+|-------|------------|-----------|----------|---------|
+| 1 | $0.1420$ | $95.12\%$ | $0.0980$ | $96.52\%$ |
+| 2 | $0.0815$ | $97.45\%$ | $0.1042$ | $96.81\%$ |
+| 3 | $0.0512$ | $98.42\%$ | $0.1115$ | $96.89\%$ |
 
-#### 4/ Hyperparameter tuning
+Thời gian huấn luyện: ${\sim}246$ giây (trên MPS/CUDA).
 
-Nhóm thử một số cấu hình đại diện để quan sát ảnh hưởng của hidden size, dropout, learning rate, số tầng LSTM và batch size.
+**Kết quả trên tập kiểm thử ($2,190$ mẫu):**
 
-![alt text](figures/lstm_hyperparameter_tuning.png)
+![alt text](figures/danhgia1_PhoBERT.png)
 
-Việc chọn mô hình tốt nhất được thực hiện tự động trên validation set. Sau khi train nhanh từng cấu hình, nhóm ưu tiên cấu hình có **Validation Macro F1** cao hơn; nếu các cấu hình tương đương nhau thì xét thêm **Negative Recall** và **Validation Loss** để phù hợp với mục tiêu phát hiện review tiêu cực.
+| Nhãn | Precision | Recall | F1-score |
+|------|-----------|--------|----------|
+| Negative | $0.9715$ | $0.9768$ | $0.9741$ |
+| Positive | $0.9650$ | $0.9570$ | $0.9610$ |
+| **Accuracy** | | | **$96.89\%$** |### 2. Đánh giá và So sánh mô hình
 
-Cấu hình được chọn là **`one_layer_batch32`**, tức một mô hình **Bidirectional LSTM một tầng** với các hyperparameter chính:
+Các mô hình được đánh giá trên tập kiểm thử gồm **2.190 quan sát** bằng các chỉ số Precision, Recall, F1-score và Accuracy.
 
-| Hyperparameter | Giá trị |
-| :--- | ---: |
-| `embedding_dim` | 128 |
-| `hidden_dim` | 256 |
-| `n_layers` | 1 |
-| `batch_size` | 32 |
-| `learning_rate` | 0.0002 |
-| `weight_decay` | 0.00001 |
-| `dropout` | 0.3 |
+### 2. Đánh giá và So sánh mô hình
 
-Điểm đặc biệt của cấu hình này là nó **đơn giản hơn mô hình LSTM ban đầu** nhưng lại cho kết quả validation tốt hơn trong thử nghiệm. Với `n_layers = 1`, PyTorch không áp dụng dropout bên trong tầng LSTM vì dropout của `nn.LSTM` chỉ hoạt động giữa các tầng khi có từ hai tầng trở lên. Như vậy, cải thiện chủ yếu đến từ việc giảm độ sâu của mô hình và dùng `batch_size = 32`, giúp mô hình cập nhật trọng số thường xuyên hơn và giảm rủi ro học quá phức tạp trên bộ dữ liệu hiện tại.
+#### 2.1. Bảng tổng hợp kết quả
 
-**Nhận xét:** Kết quả tuning cho thấy dữ liệu hiện tại chưa đòi hỏi kiến trúc quá sâu; khi tín hiệu phân loại đã khá rõ, việc tăng độ phức tạp của mô hình chưa chắc đem lại cải thiện tương xứng. Sau khi chọn cấu hình `one_layer_batch32`, nhóm tiếp tục train final model trong 10 epoch và chọn checkpoint tốt nhất ở epoch 8 dựa trên validation loss.
+**Nhóm Baseline (Machine Learning)**
 
-#### 5/ Đánh giá trên test set với threshold mặc định
+| Mô hình | Lớp | Precision | Recall | F1-score | Accuracy ước tính |
+| --- | --- | ---: | ---: | ---: | ---: |
+| Logistic Regression | Negative | $0.95$ | $0.92$ | $0.93$ | ~$91.5\%$ |
+| Logistic Regression | Positive | $0.88$ | $0.92$ | $0.90$ | ~$91.5\%$ |
+| Naive Bayes | Negative | $0.96$ | $0.87$ | $0.91$ | ~$89.5\%$ |
+| Naive Bayes | Positive | $0.82$ | $0.94$ | $0.88$ | ~$89.5\%$ |
+| SVM | Negative | $0.96$ | $0.92$ | $0.94$ | ~$92.6\%$ |
+| SVM | Positive | $0.88$ | $0.94$ | $0.91$ | ~$92.6\%$ |
 
-Với threshold mặc định `0.5`, kết quả trên test set gồm 1,643 quan sát:
+**Nhóm Deep Learning**
 
-```markdown
-              precision    recall  f1-score   support
+| Mô hình | Lớp | Precision | Recall | F1-score | Accuracy | Thời gian huấn luyện |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| Bidirectional LSTM | Negative | $0.9362$ | $0.9391$ | $0.9376$ | $92.42\%$ | ${\sim}57$ giây |
+| Bidirectional LSTM | Positive | $0.9055$ | $0.9013$ | $0.9034$ | $92.42\%$ | ${\sim}57$ giây |
+| PhoBERT Hybrid | Negative | $0.9715$ | $0.9768$ | $0.9741$ | $96.89\%$ | ${\sim}246$ giây |
+| PhoBERT Hybrid | Positive | $0.9650$ | $0.9570$ | $0.9610$ | $96.89\%$ | ${\sim}246$ giây |
 
-    Negative     0.9489    0.9318    0.9403       997
-    Positive     0.8976    0.9226    0.9099       646
+#### 2.2. Nhận xét và phân tích
 
-    accuracy                         0.9282      1643
-    macro avg     0.9233    0.9272    0.9251      1643
-  weighted avg     0.9287    0.9282    0.9283      1643
-```
-
-![alt text](figures/lstm_test_default_eval.png)
-
-Nhìn chung, LSTM đạt accuracy khoảng **92.82%** ở threshold mặc định. Mô hình nhận diện khá tốt cả hai lớp; trong đó lớp Negative có F1-score cao hơn, cho thấy mô hình tương đối nhạy với các phản hồi tiêu cực trong tập kiểm tra.
-
-#### 6/ Threshold tuning cho lớp Negative
-
-Do bài toán phân tích phản hồi khách hàng thường ưu tiên không bỏ sót review tiêu cực, nhóm tuning threshold trên validation set để tăng Negative Recall. Vì mô hình trả về xác suất `Positive`, khi **tăng threshold**, mô hình sẽ khó dự đoán Positive hơn và nhiều câu hơn sẽ được chuyển sang Negative.
-
-Threshold được chọn là:
-
-```text
-threshold = 0.66
-```
-
-![alt text](figures/lstm_threshold_tradeoff.png)
-
-Khi áp dụng threshold `0.66` trên test set:
-
-```markdown
-              precision    recall  f1-score   support
-
-    Negative     0.9430    0.9458    0.9444       997
-    Positive     0.9160    0.9118    0.9139       646
-
-    accuracy                         0.9324      1643
-    macro avg     0.9295    0.9288    0.9292      1643
-  weighted avg     0.9324    0.9324    0.9324      1643
-```
-
-![alt text](figures/lstm_test_tuned_eval.png)
-
-So với threshold `0.5`, Negative Recall tăng từ **93.18%** lên **94.58%**, đồng thời accuracy tăng từ **92.82%** lên **93.24%**. Positive Precision tăng từ **89.76%** lên **91.60%**, nhưng Positive Recall giảm từ **92.26%** xuống **91.18%**. Đây là một đánh đổi có ý nghĩa trong bối cảnh chăm sóc khách hàng, vì việc bỏ sót phản hồi tiêu cực thường gây rủi ro lớn hơn so với việc phải kiểm tra thêm một vài cảnh báo nhầm.
-
-![alt text](figures/lstm_negative_pr_curve.png)
-
-Đường Precision-Recall của lớp Negative nằm sát vùng trên của biểu đồ, với Average Precision khoảng **0.9831**. Điều này cho thấy mô hình có khả năng xếp hạng các đánh giá tiêu cực khá tốt: phần lớn review tiêu cực thật sự được mô hình gán điểm Negative cao hơn các review còn lại. Đây là một tín hiệu tích cực đối với bài toán chăm sóc khách hàng, vì hệ thống có thể ưu tiên phát hiện sớm những phản hồi xấu mà không làm tăng quá nhiều cảnh báo sai.
-
-
-### Mô hình Pre-trained Language Model (PhoBERT)
-
-#### 1. PhoBERT là gì? Một lời giới thiệu
-
-PhoBERT (`vinai/phobert-base`) là một mô hình ngôn ngữ lớn (Pre-trained Language Model) tiên tiến dành riêng cho tiếng Việt, được phát triển bởi VinAI dựa trên kiến trúc mạnh mẽ của RoBERTa (một biến thể cải tiến từ BERT của Google).
-
-Khác với các mô hình RNN hay LSTM truyền thống phải đọc văn bản tuần tự từng từ một, PhoBERT sử dụng cơ chế Transformer (Attention Mechanism), cho phép mô hình xử lý toàn bộ các từ trong câu cùng một lúc. Điều này giúp mô hình hiểu được mối quan hệ ngữ cảnh phức tạp giữa các từ ở xa nhau và nắm bắt sắc thái ngữ nghĩa tiếng Việt vượt trội.
-
-Để tối ưu hóa hiệu năng, nhóm nghiên cứu đã thử nghiệm một kiến trúc nâng cao: **Mô hình Lai (PhoBERT + Metadata Hybrid Model)**. Kiến trúc này không chỉ dựa vào ngữ nghĩa của câu chữ (văn bản đã được tách từ qua PhoBERT) mà còn tích hợp thêm các dữ kiện hành vi phi ngôn ngữ đi kèm, bao gồm:
-
-* Số sao đánh giá (`rating_stars`);
-* Sự xuất hiện của ảnh hoặc video (`has_media`).
-
-Việc kết hợp này giúp mô hình giải quyết hiệu quả các trường hợp văn bản bị nhiễu, quá ngắn, viết tắt hoặc mang tính mỉa mai (sarcasm) bằng cách sử dụng các thông tin bổ trợ từ metadata.
-
----
-
-#### 2. Cài đặt mô hình
-
-Nhóm xây dựng mạng nơ-ron tùy chỉnh `PhoBertWithMetadata` bằng thư viện PyTorch, kế thừa bộ trích xuất đặc trưng của PhoBERT và bổ sung thêm tầng phân loại lai.
-
-- Khởi tạo mô hình
-
-```python
-class PhoBertWithMetadata(nn.Module):
-    def __init__(self, phobert_model, num_metadata_features=2, num_labels=2):
-        super(PhoBertWithMetadata, self).__init__()
-
-        # 1. Bộ trích xuất đặc trưng PhoBERT
-        self.phobert = phobert_model
-
-        # 2. Tầng Fully Connected
-        # 768 (PhoBERT) + 2 (Metadata) = 770
-        self.fc1 = nn.Linear(768 + num_metadata_features, 256)
-        self.relu = nn.ReLU()
-        self.dropout = nn.Dropout(0.3)
-
-        # 3. Tầng phân loại đầu ra
-        self.classifier = nn.Linear(256, num_labels)
-```
-
-- Lan truyền thuận (Forward Propagation)
-
-```python
-def forward(self, input_ids, attention_mask, metadata):
-
-    # Trích xuất hidden states từ PhoBERT
-    outputs = self.phobert(
-        input_ids=input_ids,
-        attention_mask=attention_mask
-    )
-
-    # Lấy vector biểu diễn của token [CLS]
-    cls_output = outputs[0][:, 0, :]   # shape: [batch_size, 768]
-
-    # Cơ chế lai: nối vector ngữ nghĩa với metadata
-    combined_output = torch.cat(
-        (cls_output, metadata),
-        dim=1
-    )                                   # shape: [batch_size, 770]
-
-    # Feed Forward Network
-    x = self.fc1(combined_output)
-    x = self.relu(x)
-    x = self.dropout(x)
-
-    # Logits đầu ra
-    logits = self.classifier(x)
-
-    return logits
-```
-
-- Hàm mất mát (Loss Function)
-
-Sử dụng hàm mất mát Cross Entropy vì mô hình xuất ra các logits cho bài toán phân loại nhị phân:
-
-```python
-criterion = nn.CrossEntropyLoss()
-```
-
-- Bộ tối ưu hóa (Optimizer)
-
-Sử dụng AdamW chuyên biệt cho các mô hình Transformer:
-
-```python
-optimizer = AdamW(
-    model.parameters(),
-    lr=2e-5,
-    weight_decay=0.01
-)
-```
-
----
-
-#### 3. Đánh giá mô hình
-
-- Kết quả huấn luyện sau 3 epochs
-
-```text
---- Epoch 1/3 ---
-Train Loss: 0.1420 | Train Acc: 95.12%
-Val Loss:   0.0980 | Val Acc:   96.52%
-
---- Epoch 2/3 ---
-Train Loss: 0.0815 | Train Acc: 97.45%
-Val Loss:   0.1042 | Val Acc:   96.81%
-
---- Epoch 3/3 ---
-Train Loss: 0.0512 | Train Acc: 98.42%
-Val Loss:   0.1115 | Val Acc:   96.89%
-
-Train time on mps/cuda: 245.812 seconds
-```
-
--> ***Nhận xét:***
-
-Thời gian huấn luyện của PhoBERT dài hơn đáng kể so với LSTM truyền thống do kiến trúc Transformer có hàng trăm triệu tham số. Tuy nhiên, tốc độ hội tụ rất nhanh và mô hình đạt độ chính xác cao ngay từ những epoch đầu tiên.
-
-
-- Hiệu suất trên tập kiểm thử
-
-Tập kiểm thử gồm **2190 quan sát**.
-
-```text
-=============== BÁO CÁO HIỆU SUẤT TỔNG HỢP (PHOBERT HYBRID) ===============
-
-              precision    recall  f1-score   support
-
-Negative        0.9715     0.9768    0.9741     1329
-Positive        0.9650     0.9570    0.9610      861
-
-accuracy                              0.9689     2190
-macro avg       0.9682     0.9669    0.9676     2190
-weighted avg    0.9689     0.9689    0.9689     2190
-```
-
-![alt text](figures/danhgia_1_PhoBERT.png)
-
--> ***Nhận xét:***
-
-Mô hình PhoBERT Lai thể hiện sức mạnh vượt trội so với kiến trúc LSTM, đưa độ chính xác tổng thể (**Accuracy**) lên tới **96.89%**, tăng khoảng **4.5%**.
-
-**Precision**
-
-Khả năng dự đoán chính xác của mô hình rất cao:
-
-* Lớp **Negative** đạt 97.15%;
-* Lớp **Positive** đạt 96.50%.
-
-Điều này cho thấy số lượng dự đoán sai đã được giảm xuống mức tối thiểu.
-
-**Recall**
-
-Mô hình có khả năng phát hiện tốt các mẫu dữ liệu thuộc cả hai lớp:
-
-* Nhận diện được 97.68% số mẫu tiêu cực thực tế;
-* Nhận diện được 95.70% số mẫu tích cực thực tế.
-
-**F1-score**
-
-Điểm F1-score của cả hai lớp đều dao động từ 0.96 đến 0.97, cho thấy sự cân bằng tốt giữa Precision và Recall.
-
-Nhìn chung, cơ chế **Self-Attention** của PhoBERT kết hợp với các đặc trưng bổ trợ từ metadata đã giúp hệ thống xây dựng được một bộ phân loại cảm xúc có độ ổn định và tính bền vững cao, đạt hiệu suất tiệm cận với khả năng đánh giá của con người.
-
-
-# C. Kết luận 
-
-## Baseline Models
-| Mô hình                 | Class    | Precision | Recall | F1-score | Accuracy (ước tính) |
-| ----------------------- | -------- | --------: | -----: | -------: | ------------------: |
-| **Logistic Regression** | Negative |      0.95 |   0.92 |     0.93 |              ~91.5% |
-|                         | Positive |      0.88 |   0.92 |     0.90 |                     |
-| **Naive Bayes**         | Negative |      0.96 |   0.87 |     0.91 |              ~89.5% |
-|                         | Positive |      0.82 |   0.94 |     0.88 |                     |
-| **SVM**                 | Negative |      0.96 |   0.92 |     0.94 |              ~92.6% |
-|                         | Positive |      0.88 |   0.94 |     0.91 |                     |
-
-## Deep Learning Models
-| Mô hình                | Class    | Precision | Recall | F1-score | Accuracy | Thời gian train |
-| ---------------------- | -------- | --------: | -----: | -------: | -------: | --------------: |
-| **Bidirectional LSTM** | Negative |    0.9489 | 0.9318 |   0.9403 |   92.82% |       ~158 giây |
-|                        | Positive |    0.8976 | 0.9226 |   0.9099 |          |                 |
-| **PhoBERT Hybrid**     | Negative |    0.9715 | 0.9768 |   0.9741 |   96.89% |       ~246 giây |
-|                        | Positive |    0.9650 | 0.9570 |   0.9610 |          |                 |
-
-## Nhận xét tổng quan
-### 1. Về nhóm Baseline (ML)  
-  - **Naive Bayes** là mô hình nhanh nhất do không có tham số học được, nhưng lại yếu nhất về Recall trên class Negative (0.87) do giả định độc lập giữa các từ là không thực tế trong ngôn ngữ tự nhiên.
+**Nhóm Baseline (Machine Learning):**
+  - **Naive Bayes** là mô hình nhanh nhất do không có tham số học được, nhưng lại yếu nhất về Recall trên class Negative ($0.87$) do giả định độc lập giữa các từ là không thực tế trong ngôn ngữ tự nhiên.
   - **Logistic Regression** cân bằng tốt hơn giữa hai class, nhưng bị giới hạn bởi mối quan hệ tuyến tính giữa các đặc trưng.
-  - **SVM** đạt kết quả tốt nhất trong nhóm baseline, đặc biệt F1 Negative đạt 0.94 — điều này phù hợp với bài toán văn bản nhiều chiều, nơi SVM tỏ ra hiệu quả nhờ margin tối đa hóa.
-  -> *Cả 3 baseline đều đạt hiệu suất đáng ngạc nhiên cao dù chỉ dùng TF-IDF, khả năng cao là tập dữ liệu chưa đủ chất lượng.*
+  - **SVM** đạt kết quả tốt nhất trong nhóm baseline, đặc biệt F1 Negative đạt $0.94$ — điều này phù hợp với bài toán văn bản nhiều chiều, nơi SVM tỏ ra hiệu quả nhờ margin tối đa hóa.  
+  
+**Kết luận:** Cả ba mô hình đều đạt kết quả khá cao (89–$93\%$) dù chỉ sử dụng đặc trưng TF-IDF. Đây là dấu hiệu cho thấy bộ dữ liệu chưa thật sự phức tạp. Trong thực tế, dữ liệu NLP thường đòi hỏi các phương pháp tinh vi hơn thì kết quả mới đạt được cao như trên.
 
-### 2. Về nhóm Deep Learning (DL)
-- **Bidirectional LSTM** đạt 92.82% accuracy ở threshold mặc định, xấp xỉ SVM nhưng có khả năng học ngữ cảnh tuần tự. Khi tuning threshold lên 0.66, Negative Recall tăng từ 93.18% lên 94.58%, phù hợp hơn nếu ưu tiên phát hiện review tiêu cực.
-- Mô hình tốt nhất: **PhoBERT + Metadata** với accuracy 96.89%, vượt trội khoảng 4.07 điểm phần trăm so với LSTM. Tuy nhiên lại có một nhược điểm lớn là thời gian huấn luyện dài hơn nhiều (~246 giây) và yêu cầu tài nguyên tính toán cao hơn hẳn.
+**Nhóm Deep Learning:**
+  - **Bidirectional LSTM** đạt $92.42\%$ accuracy, ngang với SVM nhưng có khả năng học ngữ cảnh hai chiều — điều mà tất cả baseline đều không làm được. Thời gian huấn luyện chỉ ${\sim}57$ giây là rất nhanh với một mạng nơ-ron.
+  - Mô hình tốt nhất: **PhoBERT + Metadata** với accuracy $96.89\%$, vượt trội ~$4.5\%$ so với LSTM. Tuy nhiên lại có một nhược điểm lớn là thời gian huấn luyện dài hơn nhiều (${\sim}246$ giây) và yêu cầu tài nguyên tính toán cao hơn hẳn.
 
-### Tổng kết:
-Tuy các mô hình DL đạt hiệu suất khá cao trong việc đánh giá và phân loại các review. Tuy nhiên nếu để nhóm đề xuất thì trong trường hợp cụ thể này, đối với bộ dữ liệu này. Doanh nghiệp nên dùng các mô hình ML là đủ vì chi phí tính toán và vận hành thấp, không quá phức tạp mà lại đạt được hiệu quả tốt. Còn về phần các mô hình DL, nay lại chưa được thể hiện đúng với tài năng của mình khi bộ dữ liệu còn khá đơn giản và dễ đoán, ngoài ra các chi phí vận hành lại khá cao, hiệu suất cũng không chênh lệch nhiều so với tổng thể, không đáng để đánh đổi.   
-Đó là phần tổng quan về vấn đề và cách nhóm em hiểu và giải quyết, nhóm dành nhiều tình cảm để viết ra những điều này và bọn em cũng đã học được nhiều điều thông qua dự án nhỏ này. Cảm ơn cô, tạm biệt và hẹn gặp lại cô!
+### 3. Kết luận và Hướng phát triển
 
-Chân thành,  
-Nhóm 1
+#### 3.1. Tổng kết kết quả
+
+Dự án đã xây dựng thành công pipeline phân tích cảm xúc cho văn bản tiếng Việt, từ thu thập và phân tích dữ liệu, đến tiền xử lý, trích xuất đặc trưng và huấn luyện đa dạng các mô hình. Mô hình tốt nhất đạt được — PhoBERT Hybrid — cho thấy sức mạnh của các mô hình ngôn ngữ lớn được huấn luyện chuyên biệt cho tiếng Việt khi kết hợp với thông tin ngữ cảnh phi ngôn ngữ.
+
+Xét về tính ứng dụng thực tế, với bộ dữ liệu này, nhóm cho rằng các mô hình Machine Learning truyền thống (đặc biệt là SVM) là lựa chọn hợp lý hơn cho doanh nghiệp vừa và nhỏ, vì chi phí vận hành thấp, triển khai đơn giản mà hiệu suất không chênh lệch quá nhiều. Các mô hình Deep Learning sẽ thể hiện ưu thế rõ ràng hơn khi bộ dữ liệu phức tạp, đa dạng và quy mô lớn hơn.
+
+#### 3.2. Hạn chế
+
+- Bộ dữ liệu còn tương đối nhỏ và đơn giản, chưa phản ánh đầy đủ độ phức tạp của ngôn ngữ tự nhiên trong thực tế.
+- Các mô hình chưa được tinh chỉnh siêu tham số một cách hệ thống.
+- Chưa xử lý được hoàn toàn các trường hợp văn bản mỉa mai (sarcasm) và phủ định phức tạp.
+- Bộ restore_map phục hồi từ không dấu còn phụ thuộc vào tần suất trong tập dữ liệu, có thể gây sai sót với từ ít gặp.
+
+#### 3.3. Hướng phát triển tiếp theo
+
+- Mở rộng và làm phong phú thêm bộ dữ liệu, bao gồm dữ liệu từ nhiều nền tảng thương mại điện tử khác nhau.
+- Thử nghiệm các mô hình ngôn ngữ lớn tiên tiến hơn như ViT5, BARTpho hoặc các phiên bản mới hơn của PhoBERT.
+- Áp dụng các kỹ thuật tăng cường dữ liệu (data augmentation) chuyên biệt cho NLP tiếng Việt.
+- Nghiên cứu bài toán phân tích cảm xúc theo từng khía cạnh *(Aspect-Based Sentiment Analysis)* để cho kết quả phân tích chi tiết và có giá trị kinh doanh cao hơn.
+- Xây dựng hệ thống API để tích hợp mô hình vào quy trình phân tích dữ liệu thực tế của doanh nghiệp.
+
+---
+## PHỤ LỤC
+
+### A. Cấu trúc thư mục dự án
+
+```text
+sentiment-analysis-vietnamese/
+├── README.md
+├── requirements.txt
+├── data/
+│   ├── raw/
+│   ├── interim/
+│   ├── processed/
+│   └── external/
+├── notebooks/
+│   ├── 01_data_understanding.ipynb
+│   ├── 02_eda.ipynb
+│   ├── 03_text_preprocessing.ipynb
+│   ├── 04_feature_engineering.ipynb
+│   ├── 05_baseline_model.ipynb
+│   ├── 06_svm_model.ipynb
+│   ├── 07_lstm_model.ipynb
+│   └── 08_phobert_finetuning.ipynb
+├── src/
+│   ├── data/
+│   ├── preprocessing/
+│   ├── features/
+│   ├── models/
+│   └── utils/
+├── reports/
+│   ├── figures/
+│   ├── tables/
+│   └── final_report.md
+├── models/
+│   ├── baseline/
+│   ├── svm/
+│   ├── lstm/
+│   └── phobert/
+└── references/
+    ├── papers/
+    └── notes/
+```
+
+### B. Công cụ và thư viện sử dụng
+
+| Nhóm công việc | Công cụ/thư viện |
+| --- | --- |
+| Xử lý dữ liệu | pandas, numpy |
+| Trực quan hóa | matplotlib, seaborn |
+| Tiền xử lý văn bản | regex, underthesea, pyvi |
+| Trích xuất đặc trưng | scikit-learn, Word2Vec, FastText |
+| Mô hình học máy | scikit-learn |
+| Mô hình học sâu | PyTorch |
+| Transformer | transformers, datasets, PhoBERT |
+| Đánh giá mô hình | accuracy, precision, recall, F1-score, confusion matrix |
+
+### C. Tài liệu tham khảo
+
+1. Nguyen, D. Q., & Nguyen, A. T. (2020). *PhoBERT: Pre-trained language models for Vietnamese*. Findings of EMNLP 2020.
+2. Mikolov, T., et al. (2013). *Efficient Estimation of Word Representations in Vector Space*. ICLR 2013.
+3. Joulin, A., et al. (2017). *Bag of Tricks for Efficient Text Classification*. EACL 2017.
+4. Hochreiter, S., & Schmidhuber, J. (1997). *Long Short-Term Memory*. Neural Computation.
+5. Bộ dữ liệu: [Shopee Vietnamese Product Reviews Sentiment](https://www.kaggle.com/datasets/dduongdev/shopee-vietnamese-product-reviews-sentiment)
+6. Bộ stopword tiếng Việt: [vietnamese-stopwords](https://stopwords.github.io/vietnamese-stopwords/) — Le Van Duyet.
+
+---
+
