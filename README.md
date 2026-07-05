@@ -6,14 +6,20 @@ A Vietnamese customer review sentiment classification system built with classica
 
 ## Table of Contents
 
-- [Overview](#overview)
-- [Pipeline](#pipeline)
-- [Models](#models)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Results](#results)
-- [Team](#team)
+- [Customer Sentiment Analysis](#customer-sentiment-analysis)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Pipeline](#pipeline)
+  - [Models](#models)
+  - [Project Structure](#project-structure)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [1. Prepare data](#1-prepare-data)
+    - [2. Run preprocessing](#2-run-preprocessing)
+    - [3. Train models](#3-train-models)
+    - [4. Evaluate](#4-evaluate)
+  - [Results](#results)
+  - [Team](#team)
 
 ---
 
@@ -105,9 +111,6 @@ Customer_sentiment_analysis/
 │   │   ├── train_svm.py
 │   │   ├── train_lstm.py
 │   │   └── train_phobert.py
-│   ├── evaluation/
-│   │   ├── metrics.py
-│   │   └── error_analysis.py
 │   └── utils/
 │       ├── config.py
 │       └── helpers.py
